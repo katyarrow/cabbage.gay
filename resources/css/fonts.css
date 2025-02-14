@@ -1,0 +1,49 @@
+@font-face {
+    font-family: "Advent Pro";
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url("/resources/fonts/advent-pro/advent-pro.thin.ttf");
+}
+@font-face {
+    font-family: "Advent Pro";
+    font-style: normal;
+    font-weight: 200;
+    font-display: swap;
+    src: url("/resources/fonts/advent-pro/advent-pro.extralight.ttf");
+}
+@font-face {
+    font-family: "Advent Pro";
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url("/resources/fonts/advent-pro/advent-pro.light.ttf");
+}
+@font-face {
+    font-family: "Advent Pro";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/resources/fonts/advent-pro/advent-pro.regular.ttf");
+}
+@font-face {
+    font-family: "Advent Pro";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("/resources/fonts/advent-pro/advent-pro.medium.ttf");
+}
+@font-face {
+    font-family: "Advent Pro";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("/resources/fonts/advent-pro/advent-pro.semibold.ttf");
+}
+@font-face {
+    font-family: "Advent Pro";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("/resources/fonts/advent-pro/advent-pro.bold.ttf");
+}
