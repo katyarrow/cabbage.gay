@@ -1,3 +1,3 @@
 <x-main-layout>
-    <create-meeting></create-meeting>
+    <create-meeting submit-route="{{ route('meeting.store') }}"></create-meeting>
 </x-main-layout>

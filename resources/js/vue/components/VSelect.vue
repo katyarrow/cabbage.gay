@@ -17,7 +17,7 @@
 </script>
 
 <template>
-    <input v-bind="$attrs" class="
+    <select v-bind="$attrs" class="
         border-transparent
         border-2
         border-b-green-700
@@ -28,7 +28,7 @@
         py-3
         focus:px-3
         focus:outline-0
-        focus:bg-green-50
+        focus:bg-green-200
         transition-all
         rounded-tl
         rounded-tr
@@ -36,6 +36,6 @@
     "
     :class="[error ? 'border-b-red-600' : '']"
     :value="modelValue"
-    @input="handleInput($event)">
+    @input="handleInput($event)"><slot></slot></select>
     <VError v-model="error"></VError>
 </template>

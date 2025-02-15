@@ -13,16 +13,11 @@ return new class extends Migration
     {
         Schema::create('meetings', function (Blueprint $table) {
             $table->id();
-            $table->string('identifier')->index();
-            $table->string('private_key');
-            $table->string('public_key');
-            $table->text('name');
-            $table->text('date_from');
-            $table->text('date_to');
-            $table->text('time_start');
-            $table->text('time_end');
-            $table->datetime('destroy_at');
-            $table->timestamps();
+            $table->string('identifier')->unique();
+            $table->text('private_key');
+            $table->text('public_key');
+            $table->text('data');
+            $table->date('destroy_at');
         });
     }
 

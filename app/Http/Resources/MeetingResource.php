@@ -16,8 +16,12 @@ class MeetingResource extends JsonResource
     {
         return [
             'identifier' => $this->identifier,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'encrypted_content' => $this->encrypted_content,
+            'private_key' => $this->private_key,
+            'data' => $this->data,
+            'destroy_at' => $this->destroy_at,
+            'attendees' => MeetingAttendeeResource::collection($this->meetingAttendees),
+            'show_route' => route('meeting.show', $this),
+            'attendee_store_route' => route('meeting.attendee.store', $this),
         ];
     }
 }

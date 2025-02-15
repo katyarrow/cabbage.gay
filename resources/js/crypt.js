@@ -1,65 +1,119 @@
 import sodium from 'libsodium-wrappers';
 
-/**
- * Concatenate two Uint8Arrays.
- * @param {Uint8Array} arr1
- * @param {Uint8Array} arr2
- * @returns
- */
-function concatUint8Arrays(arr1, arr2) {
-    let mergedArray = new Uint8Array(arr1.length + arr2.length);
-    mergedArray.set(arr1);
-    mergedArray.set(arr2, arr1.length);
-    return mergedArray;
-}
+class Crypt {
 
-/**
- * @returns {string} a symmetric key as a hex string.
- */
-function newSymmetricKey() {
-    return sodium.to_hex(sodium.crypto_secretbox_keygen());
-}
+    key = null;
+    privateKey = null;
+    publicKey = null;
 
-/**
- * @returns {Object} an object in the form {privateKey: hex string, publicKey: hex string}.
- */
-function newAsymmetricKeypair() {
-    return sodium.crypto_sign_keypair();
-}
-
-/**
- * Encrypts the string with prepended the nonce.
- * @param {String} message
- * @param {String} key must be a hex string (for example generated from newSymmetricKey()).
- * @returns {String} a hex string of the encrypted message.
- */
-function encrypt(message, key) {
-    let nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
-    return sodium.to_hex(concatUint8Arrays(nonce, sodium.crypto_secretbox_easy(message, nonce, sodium.from_hex(key))));
-}
-
-/**
- * Decrypts the ciphertext with prepended nonce from the encrypt() function.
- * @param {String} nonce_and_ciphertext
- * @param {String} key must be a hex string (for example generated from newSymmetricKey()).
- * @returns {String} the plaintext of the given hex ciphertext.
- */
-function decrypt(nonce_and_ciphertext, key) {
-    nonce_and_ciphertext = sodium.from_hex(nonce_and_ciphertext);
-    if (nonce_and_ciphertext.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) {
-        throw "Short message";
+    static generateFromUrl() {
+        let key = location.href.split('#')[1];
+        if(key == undefined) {
+            throw new Error('No key in url.');
+        }
+        let crypt = new Crypt();
+        crypt.key = key;
+        return crypt;
     }
-    let nonce = nonce_and_ciphertext.slice(0, sodium.crypto_secretbox_NONCEBYTES),
-        ciphertext = nonce_and_ciphertext.slice(sodium.crypto_secretbox_NONCEBYTES);
-    return sodium.to_string(sodium.crypto_secretbox_open_easy(ciphertext, nonce, sodium.from_hex(key)));
+
+    /**
+     * Appends the key in plaintext to the url after the # symbol.
+     * @param {String} url
+     * @returns {String} the url plus the key in the form "url#key".
+     */
+    appendKeyToUrl(url) {
+        return url + '#' + this.key;
+    }
+
+    async awaitReady() {
+        await sodium.ready;
+    }
+
+    /**
+     * Concatenate two Uint8Arrays.
+     * @param {Uint8Array} arr1
+     * @param {Uint8Array} arr2
+     * @returns
+     */
+    concatUint8Arrays(arr1, arr2) {
+        let mergedArray = new Uint8Array(arr1.length + arr2.length);
+        mergedArray.set(arr1);
+        mergedArray.set(arr2, arr1.length);
+        return mergedArray;
+    }
+
+    /**
+     * Generates a symmetric key and assigns to key attributes.
+     */
+    newSymmetricKey() {
+        this.key = sodium.to_hex(sodium.crypto_secretbox_keygen());
+    }
+
+    /**
+     * Generates a new asymmetric keypair for privateKey and publicKey attributes.
+     */
+    newAsymmetricKeypair() {
+        let keypair = sodium.crypto_sign_keypair();
+        this.privateKey = sodium.to_hex(keypair.privateKey);
+        this.publicKey = sodium.to_hex(keypair.publicKey);
+    }
+
+    /**
+     * Generates a fresh set of symmetric and assymetric keys.
+     */
+    freshKeys() {
+        this.newSymmetricKey();
+        this.newAsymmetricKeypair();
+    }
+
+    /**
+     * Encrypts the string with prepended the nonce.
+     * @param {String} message
+     * @returns {String} a hex string of the encrypted message.
+     */
+    encrypt(message) {
+        let nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+        return sodium.to_hex(this.concatUint8Arrays(nonce, sodium.crypto_secretbox_easy(message, nonce, sodium.from_hex(this.key))));
+    }
+
+    /**
+     * Decrypts the ciphertext with prepended nonce from the encrypt() method.
+     * @param {String} nonce_and_ciphertext
+     * @returns {String} the plaintext of the given hex ciphertext.
+     */
+    decrypt(nonce_and_ciphertext) {
+        nonce_and_ciphertext = sodium.from_hex(nonce_and_ciphertext);
+        if (nonce_and_ciphertext.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) {
+            throw "Short message";
+        }
+        let nonce = nonce_and_ciphertext.slice(0, sodium.crypto_secretbox_NONCEBYTES);
+        let ciphertext = nonce_and_ciphertext.slice(sodium.crypto_secretbox_NONCEBYTES);
+        return sodium.to_string(sodium.crypto_secretbox_open_easy(ciphertext, nonce, sodium.from_hex(this.key)));
+    }
+
+    /**
+     * Get the signature of a piece of text as a hex string using the privateKey.
+     * @param {String} text
+     * @returns {String} a hex string signature.
+     */
+    getSignature(text) {
+        return sodium.to_hex(sodium.crypto_sign_detached(text, sodium.from_hex(this.privateKey)));
+    }
+
+    /**
+     * Extracts fields in given order from formObject and generates a signature using the getSignature() method.
+     * @param {Array} orderedFields
+     * @param {Object} formObject
+     * @returns {String} signature
+     */
+    getSignatureFromFormObject(orderedFields, formObject) {
+        let text = '';
+        orderedFields.forEach(fieldName => {
+            if(!formObject[fieldName]) return;
+            text += formObject[fieldName];
+        });
+        return this.getSignature(text);
+    }
 }
 
-/**
- * Get the signature of a piece of text as a hex string using the privateKey.
- * @param {String} text
- * @param {String} privateKey must be a hex string (for example generated from newSymmetricKey()).
- * @returns {String} a hex string signature.
- */
-function getSignature(text, privateKey) {
-    return sodium.to_hex(sodium.crypto_sign_detached(text, privateKey));
-}
+window.Crypt = Crypt;

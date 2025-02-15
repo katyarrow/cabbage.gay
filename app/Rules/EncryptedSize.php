@@ -5,8 +5,10 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class Hexadecimal implements ValidationRule
+class EncryptedSize implements ValidationRule
 {
+    public function __construct(private int $size) {}
+
     /**
      * Run the validation rule.
      *
@@ -14,8 +16,8 @@ class Hexadecimal implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! ctype_xdigit($value)) {
-            $fail('The :attribute is an invalid hexadecimal string.');
+        if (strlen($value) < $this->size) {
+            $fail('The :attribute is the wrong length.');
         }
     }
 }

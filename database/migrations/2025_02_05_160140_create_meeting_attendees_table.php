@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('meeting_attendees', function (Blueprint $table) {
             $table->id();
+            $table->string('identifier')->unique();
             $table->foreignId('meeting_id')->constrained('meetings')->cascadeOnDelete();
             $table->text('data');
-            $table->timestamps();
+            $table->text('destroy_challenge');
         });
     }
 

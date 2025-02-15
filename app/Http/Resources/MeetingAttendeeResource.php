@@ -14,6 +14,11 @@ class MeetingAttendeeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'identifier' => $this->identifier,
+            'data' => $this->data,
+            'destroy_challenge' => $this->destroy_challenge,
+            'destroy_route' => route('meeting.attendee.destroy', $this),
+        ];
     }
 }
