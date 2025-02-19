@@ -17,12 +17,12 @@
 </script>
 
 <template>
-    <input v-bind="$attrs" class="
+    <input type="checkbox" v-bind="$attrs" class="
         accent-green-700
         transition-colors
     "
     :class="[error ? 'border-b-red-600' : '']"
-    :value="modelValue"
+    :checked="modelValue"
     @change="handleInput($event)">
     <VError v-model="error"></VError>
 </template>

@@ -47,7 +47,7 @@ const submit = () => {
     let dataForm = {
         name: form.value.name,
         timezone: form.value.timezone,
-        entire_period: form.value.entire_period ? '1' : '0',
+        entire_period: form.value.entire_period,
         start_date: form.value.start_date,
         end_date: form.value.end_date,
         start_time: form.value.start_time,

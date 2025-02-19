@@ -1,14 +1,14 @@
 <script setup>
 
-import VInput from './components/VInput.vue';
-import VLabel from './components/VLabel.vue';
-import VLegend from './components/VLegend.vue';
+import VCheckbox from './components/VCheckbox.vue';
 import VButton from './components/VButton.vue';
 import VAlert from './components/VAlert.vue';
 import moment from 'moment';
 import { onMounted, ref } from 'vue';
 import EntirePeriod from './components/Meeting/EntirePeriod.vue';
 import { VueFinalModal } from 'vue-final-modal';
+import OptionalPeriod from './components/Meeting/OptionalPeriod.vue';
+import VLabel from './components/VLabel.vue';
 
 const props = defineProps({
     meeting: Object,
@@ -19,6 +19,8 @@ const loaded = ref(false);
 const posting = ref(false);
 const crypt = ref(null);
 const mode = ref('show');
+const shared = ref(false);
+const selectedAttendee = ref(null);
 
 const meeting = ref({
     name: null,
@@ -32,16 +34,23 @@ const meeting = ref({
 });
 
 const attendees = ref([]);
+const symbolMode = ref(false);
 
 const parseAttendees = (encryptedAttendeeArray) => {
     return encryptedAttendeeArray.map(a => {
-        let data = JSON.parse(crypt.value.decrypt(a.data));
+        let data;
+        try{
+            data = JSON.parse(crypt.value.decrypt(a.data));
+        } catch (SyntaxError) {
+            // in case the attendee data is not valid json.
+            return false;
+        }
         data.identifier = a.identifier;
         data.destroy_route = a.destroy_route;
         data.destroy_challenge = a.destroy_challenge;
         data.showDelete = a.showDelete;
         return data;
-    });
+    }).filter(a => a !== false);
 }
 
 onMounted(async() => {
@@ -94,6 +103,12 @@ const deleteAttendee = (attendee) => {
         .then(() => posting.value = false);
 }
 
+const copyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    shared.value = true;
+    setTimeout(() => shared.value = false, 3000);
+}
+
 </script>
 
 <template>
@@ -103,53 +118,83 @@ const deleteAttendee = (attendee) => {
             <span class="animate-pulse font-semibold text-2xl" v-if="!loaded">Loading...</span>
             <span class="animate-pulse font-semibold text-2xl" v-if="posting">Sending data...</span>
         </div>
-        <div v-else>
+        <div v-else :class="meeting.entire_period ? '' : 'px-5'">
             <div class="grid grid-cols-2 py-3">
                 <div class="flex flex-col">
-                    <h1 class="text-xl font-bold tracking-wider text-left">{{ meeting.name }}</h1>
-                    <div>
+                    <div class="flex items-center">
+                        <h1 class="text-xl font-bold tracking-wider text-left">{{ meeting.name }}</h1>
+                    </div>
+                    <div class="flex items-center gap-3">
                         <span class="text-gray-600 whitespace-nowrap">
                             {{ moment(meeting.start_time, 'HH:mm').format('h a') }}
                             -
                             {{ moment(meeting.end_time, 'HH:mm').format('h a') }}
                             ({{ meeting.timezone }})
                         </span>
+                        <VButton size="xs" @click="copyLink">
+                            <span v-if="!shared">Share <i class="fas fa-share"></i></span>
+                            <span v-else>Copied <i class="fas fa-check"></i></span>
+                        </VButton>
                     </div>
                 </div>
-                <div class="text-right">
+                <div class="flex flex-col justify-start items-end gap-2">
                     <VButton size="sm" v-if="mode == 'show'" @click="mode = 'add'">Add Availability</VButton>
                     <VButton size="sm" v-if="mode == 'add'" color="danger" @click="mode = 'show'">Cancel</VButton>
+                    <VLabel class="select-none" v-if="!meeting.entire_period">
+                        Symbol Mode
+                        <VCheckbox v-model="symbolMode"></VCheckbox>
+                    </VLabel>
                 </div>
             </div>
-            <EntirePeriod
-                v-if="meeting.entire_period"
-                :meeting="meeting"
-                :attendees="attendees"
-                :mode="mode"
-                @submit="onAttendeeSubmit"
-                ></EntirePeriod>
-            <div class="my-5">
-                <h2 class="text-lg font-semibold tracking-wider text-left">Responders ({{ attendees.length }})</h2>
-                <ul class="list-disc list-inside grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <li v-for="attendee in attendees">
-                        {{ attendee.name }}
-                        <button @click="attendee.showDelete = true" aria-label="Delete responder" class="cursor-pointer ml-2">
-                            <i class="fa fa-xmark text-red-600 text-sm"></i>
-                        </button>
-                        <VueFinalModal
-                            v-model="attendee.showDelete" class="flex justify-center items-center"
-                            content-class="bg-white p-5 rounded relative">
-                            <button class="absolute top-0 right-1 cursor-pointer" @click="attendee.showDelete = false" aria-label="Close Modal"><i class="fa fa-xmark"></i></button>
-                            <form @submit.prevent="deleteAttendee(attendee)">
-                                Are you sure you want to delete this response?
-                                <div class="flex items-center justify-between mt-5">
-                                    <VButton type="submit" color="danger">Delete</VButton>
-                                    <VButton type="button" color="secondary" @click="attendee.showDelete = false">Cancel</VButton>
-                                </div>
-                            </form>
-                        </VueFinalModal>
-                    </li>
-                </ul>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
+                <div class="col-span-4">
+                    <EntirePeriod
+                        v-if="meeting.entire_period"
+                        :meeting="meeting"
+                        :attendees="attendees"
+                        :selected-attendee="selectedAttendee"
+                        :mode="mode"
+                        @submit="onAttendeeSubmit"
+                    ></EntirePeriod>
+                    <OptionalPeriod
+                        v-else
+                        :meeting="meeting"
+                        :attendees="attendees"
+                        :selected-attendee="selectedAttendee"
+                        :mode="mode"
+                        :symbol-mode="symbolMode"
+                        @submit="onAttendeeSubmit"
+                    ></OptionalPeriod>
+                </div>
+                <div class="my-5 md:mt-10" v-if="mode == 'show'">
+                    <h2 class="text-lg font-semibold tracking-wider text-left text-nowrap">Responders ({{ attendees.length }})</h2>
+                    <ul class="list-disc list-inside flex flex-col gap-3">
+                        <li v-for="attendee in attendees">
+                            <button
+                                type="button"
+                                class="hover:text-green-600 hover:font-medium cursor-pointer"
+                                :class="[selectedAttendee === attendee ? 'text-green-500 font-medium' : '']"
+                                @click="selectedAttendee = selectedAttendee === attendee ? selectedAttendee = null : selectedAttendee = attendee">
+                                {{ attendee.name }}
+                            </button>
+                            <button @click="attendee.showDelete = true" aria-label="Delete responder" class="cursor-pointer ml-2">
+                                <i class="fa fa-xmark text-red-600 text-sm"></i>
+                            </button>
+                            <VueFinalModal
+                                v-model="attendee.showDelete" class="flex justify-center items-center"
+                                content-class="bg-white p-5 rounded relative">
+                                <button class="absolute top-0 right-1 cursor-pointer" @click="attendee.showDelete = false" aria-label="Close Modal"><i class="fa fa-xmark"></i></button>
+                                <form @submit.prevent="deleteAttendee(attendee)">
+                                    Are you sure you want to delete this response for "{{ attendee.name }}"?
+                                    <div class="flex items-center justify-between mt-5">
+                                        <VButton type="submit" color="danger">Delete</VButton>
+                                        <VButton type="button" color="secondary" @click="attendee.showDelete = false">Cancel</VButton>
+                                    </div>
+                                </form>
+                            </VueFinalModal>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
