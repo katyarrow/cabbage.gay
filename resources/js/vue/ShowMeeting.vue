@@ -21,6 +21,7 @@ const crypt = ref(null);
 const mode = ref('show');
 const shared = ref(false);
 const selectedAttendee = ref(null);
+const selectedDay = ref(null);
 
 const meeting = ref({
     name: null,
@@ -152,7 +153,8 @@ const copyLink = () => {
                         v-if="meeting.entire_period"
                         :meeting="meeting"
                         :attendees="attendees"
-                        :selected-attendee="selectedAttendee"
+                        v-model:selected-attendee="selectedAttendee"
+                        v-model:selected-day="selectedDay"
                         :mode="mode"
                         @submit="onAttendeeSubmit"
                     ></EntirePeriod>
@@ -160,38 +162,55 @@ const copyLink = () => {
                         v-else
                         :meeting="meeting"
                         :attendees="attendees"
-                        :selected-attendee="selectedAttendee"
                         :mode="mode"
                         :symbol-mode="symbolMode"
+                        v-model:selected-attendee="selectedAttendee"
+                        v-model:selected-day="selectedDay"
                         @submit="onAttendeeSubmit"
                     ></OptionalPeriod>
                 </div>
-                <div class="my-5 md:mt-10" v-if="mode == 'show'">
+                <div :class="[meeting.entire_period ? '' : 'my-5 md:mt-10']" v-if="mode == 'show'">
                     <h2 class="text-lg font-semibold tracking-wider text-left text-nowrap">Responders ({{ attendees.length }})</h2>
                     <ul class="list-disc list-inside flex flex-col gap-3">
                         <li v-for="attendee in attendees">
-                            <button
-                                type="button"
-                                class="hover:text-green-600 hover:font-medium cursor-pointer"
-                                :class="[selectedAttendee === attendee ? 'text-green-500 font-medium' : '']"
+                            <span
+                                v-if="selectedDay"
+                                class="font-medium"
+                                :class="[
+                                    selectedDay.attendeesYes.find(a => a.identifier == attendee.identifier) ? 'text-green-700' : '',
+                                    selectedDay.attendeesMaybe.find(a => a.identifier == attendee.identifier) ? 'text-yellow-600' : '',
+                                    selectedDay.attendeesNo.find(a => a.identifier == attendee.identifier) ? 'opacity-50 line-through' : '',
+                                ]"
                                 @click="selectedAttendee = selectedAttendee === attendee ? selectedAttendee = null : selectedAttendee = attendee">
-                                {{ attendee.name }}
-                            </button>
-                            <button @click="attendee.showDelete = true" aria-label="Delete responder" class="cursor-pointer ml-2">
-                                <i class="fa fa-xmark text-red-600 text-sm"></i>
-                            </button>
-                            <VueFinalModal
-                                v-model="attendee.showDelete" class="flex justify-center items-center"
-                                content-class="bg-white p-5 rounded relative">
-                                <button class="absolute top-0 right-1 cursor-pointer" @click="attendee.showDelete = false" aria-label="Close Modal"><i class="fa fa-xmark"></i></button>
-                                <form @submit.prevent="deleteAttendee(attendee)">
-                                    Are you sure you want to delete this response for "{{ attendee.name }}"?
-                                    <div class="flex items-center justify-between mt-5">
-                                        <VButton type="submit" color="danger">Delete</VButton>
-                                        <VButton type="button" color="secondary" @click="attendee.showDelete = false">Cancel</VButton>
-                                    </div>
-                                </form>
-                            </VueFinalModal>
+                                <i class="far fa-circle-check" aria-label="Yes" v-if="selectedDay.attendeesYes.find(a => a.identifier == attendee.identifier)"></i>
+                                <i class="far fa-circle-question" aria-label="Maybe" v-else-if="selectedDay.attendeesMaybe.find(a => a.identifier == attendee.identifier)"></i>
+                                <i class="far fa-circle-xmark" aria-label="No" v-else-if="selectedDay.attendeesNo.find(a => a.identifier == attendee.identifier)"></i>
+                                <span class="ml-2">{{ attendee.name }}</span>
+                            </span>
+                            <span v-else>
+                                <button
+                                    type="button"
+                                    class="hover:text-green-600 hover:font-medium cursor-pointer"
+                                    :class="[selectedAttendee === attendee ? 'text-green-500 font-medium' : '']"
+                                    @click="selectedAttendee = selectedAttendee === attendee ? selectedAttendee = null : selectedAttendee = attendee">
+                                    {{ attendee.name }}
+                                </button>
+                                <button @click="attendee.showDelete = true" aria-label="Delete responder" class="cursor-pointer ml-2">
+                                    <i class="fa fa-xmark text-red-600 text-sm"></i>
+                                </button>
+                                <VueFinalModal
+                                    v-model="attendee.showDelete" class="flex justify-center items-center"
+                                    content-class="bg-white p-5 rounded relative">
+                                    <button class="absolute top-0 right-1 cursor-pointer" @click="attendee.showDelete = false" aria-label="Close Modal"><i class="fa fa-xmark"></i></button>
+                                    <form @submit.prevent="deleteAttendee(attendee)">
+                                        Are you sure you want to delete this response for "{{ attendee.name }}"?
+                                        <div class="flex items-center justify-between mt-5">
+                                            <VButton type="submit" color="danger">Delete</VButton>
+                                            <VButton type="button" color="secondary" @click="attendee.showDelete = false">Cancel</VButton>
+                                        </div>
+                                    </form>
+                                </VueFinalModal>
+                            </span>
                         </li>
                     </ul>
                 </div>

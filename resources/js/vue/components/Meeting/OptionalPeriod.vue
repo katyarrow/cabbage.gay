@@ -7,7 +7,7 @@ import VLabel from '../VLabel.vue';
 import VButton from '../VButton.vue';
 import VAlert from '../VAlert.vue';
 import moment from 'moment';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { VueFinalModal } from 'vue-final-modal';
 
 const props = defineProps({
@@ -15,10 +15,11 @@ const props = defineProps({
     mode: String,
     symbolMode: Boolean,
     attendees: Array,
-    selectedAttendee: Object,
 });
 
 const emit = defineEmits(['submit']);
+const selectedAttendee = defineModel('selectedAttendee', {type: Object, default: null});
+const selectedDay = defineModel('selectedDay', {type: Object, default: null});
 
 const dateFormat = 'YYYY-MM-DD';
 const dateTimeFormat = 'YYYY-MM-DD HH:mm';
@@ -97,7 +98,6 @@ const generateDays = () => {
     while(currTime < endTime) {
         times.value.push({
             time: currTime.clone(),
-            showAttendees: false,
         });
         currTime.add(30, 'minutes');
     }
@@ -128,6 +128,29 @@ const getAvailabilityByIndex = (dateIndex, timeIndex) => {
     return getAvailability(date, time);
 }
 
+const toggleDay = (day, time) => {
+    if(selectedDayIsSame(day, time)) {
+        selectedDay.value = null;
+        return;
+    }
+    selectedAttendee.value = null;
+    nextTick(() => {
+        let displayInfo = gridSquareDisplayInfo(day.date, time.time);
+        selectedDay.value = {
+            date: day.date,
+            time: time.time,
+            datetime: addDateAndTime(day.date, time.time),
+            attendeesYes: displayInfo.attendeesYes,
+            attendeesMaybe: displayInfo.attendeesMaybe,
+            attendeesNo: displayInfo.attendeesNo,
+        };
+    });
+}
+
+const selectedDayIsSame = (day, time) => {
+    return selectedDay.value && selectedDay.value.datetime.isSame(addDateAndTime(day.date, time.time));
+}
+
 const gridSquareDisplayInfoCache = ref({});
 
 const gradient = [
@@ -147,7 +170,10 @@ const gridSquareDisplayInfo = (date, time) => {
     let values = attendees.map(a => a.dates[datetime]).filter(v => !!v);
     let valuesPositive = values.filter(v => v == 'yes' || v == 'maybe');
     let valuesYes = values.filter(v => v == 'yes');
+    let attendeesYes = attendees.filter(a => a.dates[datetime] == 'yes');
     let valuesMaybe = values.filter(v => v == 'maybe');
+    let attendeesMaybe = attendees.filter(a => a.dates[datetime] == 'maybe');
+    let attendeesNo = attendees.filter(a => !(a.dates[datetime] == 'yes' || a.dates[datetime] == 'maybe'));
     let ratio = Math.round((valuesMaybe.length / Math.max(1, valuesPositive.length)) * 4 ) / 4;
     let inverseRatio = 1 - ratio;
     let opacity = Math.round((valuesPositive.length / attendees.length) * 100) / 100;
@@ -161,6 +187,9 @@ const gridSquareDisplayInfo = (date, time) => {
         inverseRatio: inverseRatio,
         opacity: opacity,
         gradientColor: gradientColor,
+        attendeesYes: attendeesYes,
+        attendeesMaybe: attendeesMaybe,
+        attendeesNo: attendeesNo,
     };
     gridSquareDisplayInfoCache.value[datetime] = info;
     return info;
@@ -174,7 +203,7 @@ const dragInfo = ref({
     originalValues: {},
 });
 
-const startDrag = (dateIndex, timeIndex) => {
+const startDrag = (dateIndex, timeIndex, selectOne) => {
     dragInfo.value.dragging = true;
     dragInfo.value.startDateIndex = dateIndex;
     dragInfo.value.startTimeIndex = timeIndex;
@@ -187,6 +216,10 @@ const startDrag = (dateIndex, timeIndex) => {
     dragInfo.value.value = value;
     dragInfo.value.originalValues = {...availability.value.dates};
     addOrUpdateAvailability(pageAwareIndex(dateIndex), timeIndex, dragInfo.value.value);
+
+    if(selectOne) {
+        dragInfo.value.dragging = false;
+    }
 }
 
 const stopDrag = () => {
@@ -265,17 +298,21 @@ const submit = () => {
                 <tbody>
                     <tr v-for="(time, timeIndex) in times" draggable="false">
                         <th scope="row" class="text-xs md:text-sm text-right pr-2 w-2 align-top font-normal">
-                            <span v-if="timeIndex % 2 == 0" class="select-none">{{ time.time.format('h a') }}</span>
+                            <span :class="[timeIndex % 2 == 0 ? '' : 'sr-only']" class="select-none">
+                                <time v-if="timeIndex % 2 == 0">{{ time.time.format('h a') }}</time>
+                                <time v-else>{{ time.time.format('h:mm a') }}</time>
+                            </span>
                         </th>
                         <td
                             draggable="false"
                             v-for="(day, dateIndex) in paginatedDays.days"
-                            class="border border-gray-400 h-5"
+                            class="border border-gray-400 h-5 relative"
                             :class="[
-                                timeIndex % 2 == 0 ? 'border-b-0' : 'border-t-0'
+                                timeIndex % 2 == 0 ? 'border-b-0' : 'border-t-0',
+                                selectedDayIsSame(day, time) ? 'border-dashed border border-gray-600' : '',
                             ]"
                         >
-                            <div v-if="mode == 'add'" class="grid-square h-full flex items-center justify-center"
+                            <div v-if="mode == 'add'" class="grid-square h-full flex items-center justify-center relative"
                                 draggable="false"
                                 @pointerdown="startDrag(dateIndex, timeIndex)"
                                 @mouseenter="hoverEnter(dateIndex, timeIndex)"
@@ -285,22 +322,30 @@ const submit = () => {
                                 :class="[
                                     {'yes': 'bg-green-400', 'maybe': 'bg-yellow-300', 'no': ''}[getAvailability(day.date, time.time)]
                                 ]">
-                                <div v-if="props.symbolMode" class="text-center text-gray-600 text-xs">
-                                    <i class="far fa-circle-check" v-if="getAvailability(day.date, time.time) == 'yes'"></i>
-                                    <i class="far fa-circle-question" v-else-if="getAvailability(day.date, time.time) == 'maybe'"></i>
+                                <div :class="[symbolMode ? '' : 'sr-only']" class="text-center text-gray-600 text-xs">
+                                    <i class="far fa-circle-check" v-if="getAvailability(day.date, time.time) == 'yes'" aria-label="Yes"></i>
+                                    <i class="far fa-circle-question" v-else-if="getAvailability(day.date, time.time) == 'maybe'" aria-label="Maybe"></i>
+                                    <span v-else class="sr-only">No</span>
                                 </div>
+                                <button type="button" class="absolute inset-0" @click="startDrag(dateIndex, timeIndex, true)">
+                                    <span class="sr-only" v-if="getAvailability(day.date, time.time) == 'yes'">Change to maybe</span>
+                                    <span class="sr-only" v-else="getAvailability(day.date, time.time) == 'maybe'">Change to no</span>
+                                    <span class="sr-only" v-else>Change to yes</span>
+                                </button>
                             </div>
                             <div v-else class="h-full">
                                 <div v-if="displayType == 'proportion' || props.selectedAttendee" class="h-full w-full relative select-none" :style="{opacity: gridSquareDisplayInfo(day.date, time.time).opacity}">
                                     <div
                                         class="bg-yellow-300 inline-flex items-center justify-center absolute top-0 bottom-0 left-0"
-                                        :style="{width: gridSquareDisplayInfo(day.date, time.time).ratio * 100 + '%'}">
+                                        :style="{width: (gridSquareDisplayInfo(day.date, time.time).ratio * 100) + '%'}"
+                                        :aria-label="'Maybe ' + (gridSquareDisplayInfo(day.date, time.time).ratio * 100) + '%'">
                                         <i class="far fa-circle-question text-xs" v-if="props.symbolMode && gridSquareDisplayInfo(day.date, time.time).ratio > 0"></i>
                                         <span v-else>&nbsp;</span>
                                     </div>
                                     <div
                                         class="bg-green-500 inline-flex items-center justify-center absolute top-0 bottom-0 right-0"
-                                        :style="{width: gridSquareDisplayInfo(day.date, time.time).inverseRatio * 100 + '%'}">
+                                        :style="{width: (gridSquareDisplayInfo(day.date, time.time).inverseRatio * 100) + '%'}"
+                                        :aria-label="'Maybe ' + (gridSquareDisplayInfo(day.date, time.time).inverseRatio * 100) + '%'">
                                         <i class="far fa-circle-check text-xs" v-if="props.symbolMode && gridSquareDisplayInfo(day.date, time.time).inverseRatio > 0"></i>
                                         <span v-else>&nbsp;</span>
                                     </div>
@@ -309,16 +354,17 @@ const submit = () => {
                                     class="h-full w-full relative select-none bg-green-500 flex items-center justify-center"
                                     :style="{opacity: gridSquareDisplayInfo(day.date, time.time).opacity}">
                                     <i class="far fa-circle-check text-xs" v-if="props.symbolMode && gridSquareDisplayInfo(day.date, time.time).opacity > 0"></i>
+                                    <span class="sr-only">{{ gridSquareDisplayInfo(day.date, time.time).total }} responses</span>
                                 </div>
                                 <div v-else-if="displayType == 'numbers'">
                                     <div class="flex items-center justify-around md:px-1 text-xs font-bold text-nowrap" v-if="gridSquareDisplayInfo(day.date, time.time).total > 0">
                                         <span class="flex items-center gap-1">
                                             <span class="text-yellow-600 sm:text-gray-800">{{ gridSquareDisplayInfo(day.date, time.time).totalMaybe }}</span>
-                                            <i class="far fa-circle-question text-yellow-600"></i>
+                                            <i class="far fa-circle-question text-yellow-600" aria-label="Maybe"></i>
                                         </span>
                                         <span class="flex items-center gap-1">
                                             <span class="text-green-500 sm:text-gray-800">{{ gridSquareDisplayInfo(day.date, time.time).totalYes }}</span>
-                                            <i class="far fa-circle-check text-green-500"></i>
+                                            <i class="far fa-circle-check text-green-500" aria-label="Yes"></i>
                                         </span>
                                     </div>
                                 </div>
@@ -328,7 +374,10 @@ const submit = () => {
                                         opacity: gridSquareDisplayInfo(day.date, time.time).opacity,
                                         'background-color': gridSquareDisplayInfo(day.date, time.time).gradientColor,
                                     }">
-                                    <span v-if="props.symbolMode" class="flex items-center gap-1">
+                                    <span class="sr-only">{{ gridSquareDisplayInfo(day.date, time.time).total }} Responses</span>
+                                    <span class="sr-only">{{ gridSquareDisplayInfo(day.date, time.time).totalYes }} Yes</span>
+                                    <span class="sr-only">{{ gridSquareDisplayInfo(day.date, time.time).totalMaybe }} Maybe</span>
+                                    <span v-if="props.symbolMode" class="flex items-center gap-1" aria-hidden="true">
                                         <i class="far fa-circle-question text-xs" v-if="gridSquareDisplayInfo(day.date, time.time).ratio > 0"></i>
                                         <span v-if="gridSquareDisplayInfo(day.date, time.time).ratio > 0 && gridSquareDisplayInfo(day.date, time.time).inverseRatio > 0">+</span>
                                         <i class="far fa-circle-check text-xs" v-if="gridSquareDisplayInfo(day.date, time.time).inverseRatio > 0"></i>
@@ -343,14 +392,22 @@ const submit = () => {
                                     <div class="flex items-center justify-around md:px-1 text-xs font-bold text-nowrap" v-if="gridSquareDisplayInfo(day.date, time.time).total > 0">
                                         <span class="flex items-center gap-1">
                                             <span>{{ gridSquareDisplayInfo(day.date, time.time).totalMaybe }}</span>
-                                            <i class="far fa-circle-question"></i>
+                                            <i class="far fa-circle-question" aria-label="Maybe"></i>
                                         </span>
                                         <span class="flex items-center gap-1">
                                             <span>{{ gridSquareDisplayInfo(day.date, time.time).totalYes }}</span>
-                                            <i class="far fa-circle-check"></i>
+                                            <i class="far fa-circle-check" aria-label="Yes"></i>
                                         </span>
                                     </div>
                                 </div>
+                                <button
+                                    type="button"
+                                    class="box-border absolute inset-0 hover:border border-dashed"
+                                    :class="[selectedDayIsSame(day, time) ? 'border' : '']"
+                                    @click="toggleDay(day, time)"
+                                >
+                                    <span class="sr-only">Toggle attendees on this time slot</span>
+                                </button>
                             </div>
                         </td>
                     </tr>

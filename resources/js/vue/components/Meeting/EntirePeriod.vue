@@ -5,17 +5,17 @@ import VLabel from '../VLabel.vue';
 import VButton from '../VButton.vue';
 import VAlert from '../VAlert.vue';
 import moment from 'moment';
-import { computed, onMounted, ref, watch } from 'vue';
-import { VueFinalModal } from 'vue-final-modal';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
     meeting: Object,
     mode: String,
     attendees: Array,
-    selectedAttendee: Object,
 });
 
 const emit = defineEmits(['submit']);
+const selectedAttendee = defineModel('selectedAttendee', {type: Object, default: null});
+const selectedDay = defineModel('selectedDay', {type: Object, default: null});
 
 const dateFormat = 'YYYY-MM-DD';
 const generalError = ref(null);
@@ -41,9 +41,6 @@ const generateDays = () => {
     while(current <= endDate) {
         days.value.push({
             date: current.clone(),
-            showYes: false,
-            showMaybe: false,
-            showNo: false,
         });
         current.add(1, 'day');
     }
@@ -74,12 +71,32 @@ const filteredAttendees = computed(() => {
     return props.selectedAttendee ? props.attendees.filter(a => a == props.selectedAttendee) : props.attendees;
 });
 
-const valueCountOnDate = (date, value) => {
-    return filteredAttendees.value.filter(a => a.dates[date] == value).length;
+const attendeesOnDayWithValue = (date, value) => {
+    return filteredAttendees.value.filter(a => a.dates[date] == value);
 }
 
-const valueOnDateArray = (date, value) => {
-    return filteredAttendees.value.filter(a => a.dates[date] == value);
+const valueCountOnDate = (date, value) => {
+    return attendeesOnDayWithValue(date, value).length;
+}
+
+const selectedDayIsSame = (day) => {
+    return selectedDay.value && selectedDay.value.date.isSame(day.date);
+}
+
+const toggleDay = (day) => {
+    if(selectedDayIsSame(day)) {
+        selectedDay.value = null;
+        return;
+    }
+    selectedAttendee.value = null;
+    nextTick(() => {
+        selectedDay.value = {
+            date: day.date,
+            attendeesYes: attendeesOnDayWithValue(day.date.format(dateFormat), 'yes'),
+            attendeesMaybe: attendeesOnDayWithValue(day.date.format(dateFormat), 'maybe'),
+            attendeesNo: attendeesOnDayWithValue(day.date.format(dateFormat), 'no'),
+        };
+    })
 }
 
 </script>
@@ -90,78 +107,60 @@ const valueOnDateArray = (date, value) => {
         <ul class="grid grid-cols-1 md:grid-cols-4 gap-5">
             <li
                 v-for="day in days" :key="day.date.format(dateFormat)"
-                class="px-3 py-4 border border-gray-200 rounded relative"
             >
-                <p class="absolute top-0 right-1 text-xs opacity-50">
-                    <span class="sr-only">Year </span>
-                    {{ day.date.format('YYYY') }}
-                </p>
-                <p class="text-center font-semibold tracking-wide">
-                    {{ day.date.format('ddd Do MMMM') }}
-                </p>
-                <div class="flex items-center justify-center gap-3 mt-3 text-center text-sm" v-if="mode == 'show'">
-                    <button class="bg-green-600 rounded px-2 text-white cursor-pointer" @click="day.showYes = true">
-                        <span class="sr-only">Yes</span>
-                        <span class="font-bold rounded tracking-widest whitespace-nowrap">
-                            <span class="">{{ valueCountOnDate(day.date.format(dateFormat), 'yes') }}</span>
-                            <i class="far fa-circle-check inline-block ml-px text-xs"></i>
-                        </span>
+                <div
+                    class="px-3 py-4 border rounded relative cursor-pointer hover:bg-gray-50 focus:bg-gray-50 transition-colors"
+                    :class="[selectedDayIsSame(day) ? 'border-green-600' : 'border-gray-200']"
+                    v-if="mode == 'show'">
+                    <p class="absolute top-0 right-1 text-xs opacity-50">
+                        <span class="sr-only">Year </span>
+                        {{ day.date.format('YYYY') }}
+                    </p>
+                    <p class="text-center font-semibold tracking-wide">
+                        {{ day.date.format('ddd Do MMMM') }}
+                    </p>
+                    <div class="flex items-center justify-center gap-3 mt-3 text-center text-sm">
+                        <div class="bg-green-600 rounded px-2 text-white cursor-pointer">
+                            <span class="sr-only">Yes</span>
+                            <span class="font-bold rounded tracking-widest whitespace-nowrap">
+                                <span class="">{{ valueCountOnDate(day.date.format(dateFormat), 'yes') }}</span>
+                                <i class="far fa-circle-check inline-block ml-px text-xs" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <div class="bg-yellow-400 rounded px-2 cursor-pointer">
+                            <span class="sr-only">Maybe</span>
+                            <span class="font-bold rounded tracking-widest whitespace-nowrap">
+                                <span class="">{{ valueCountOnDate(day.date.format(dateFormat), 'maybe') }}</span>
+                                <i class="far fa-circle-question inline-block ml-px text-xs" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <div class="bg-gray-300 rounded px-2 cursor-pointer">
+                            <span class="sr-only">No</span>
+                            <span class="font-bold rounded tracking-widest whitespace-nowrap">
+                                <span class="">{{ valueCountOnDate(day.date.format(dateFormat), 'no') }}</span>
+                                <i class="far fa-circle-xmark inline-block ml-px text-xs" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <button class="absolute inset-0" @click="toggleDay(day)">
+                        <span class="sr-only" v-if="selectedDayIsSame(day)">Show responses for this day.</span>
+                        <span class="sr-only" v-else>Unselect responses for this day</span>
                     </button>
-                    <VueFinalModal
-                        v-model="day.showYes" class="flex justify-center items-center"
-                        content-class="bg-white p-5 rounded relative">
-                        <button class="absolute top-0 right-1 cursor-pointer" @click="day.showYes = false" aria-label="Close Modal"><i class="fa fa-xmark"></i></button>
-                        <ul class="list-disc list-inside">
-                            <h2 class="text-lg font-semibold tracking-wider text-left">Available on {{ day.date.format('ddd Do MMMM') }}</h2>
-                            <li v-for="attendee in valueOnDateArray(day.date.format(dateFormat), 'yes')">
-                                {{ attendee.name }}
-                            </li>
-                        </ul>
-                    </VueFinalModal>
-                    <button class="bg-yellow-400 rounded px-2 cursor-pointer" @click="day.showMaybe = true">
-                        <span class="sr-only">Maybe</span>
-                        <span class="font-bold rounded tracking-widest whitespace-nowrap">
-                            <span class="">{{ valueCountOnDate(day.date.format(dateFormat), 'maybe') }}</span>
-                            <i class="far fa-circle-question inline-block ml-px text-xs"></i>
-                        </span>
-                    </button>
-                    <VueFinalModal
-                        v-model="day.showMaybe" class="flex justify-center items-center"
-                        content-class="bg-white p-5 rounded relative">
-                        <button class="absolute top-0 right-1 cursor-pointer" @click="day.showMaybe = false" aria-label="Close Modal"><i class="fa fa-xmark"></i></button>
-                        <h2 class="text-lg font-semibold tracking-wider text-left">Maybe available on {{ day.date.format('ddd Do MMMM') }}</h2>
-                        <ul class="list-disc list-inside">
-                            <li v-for="attendee in valueOnDateArray(day.date.format(dateFormat), 'maybe')">
-                                {{ attendee.name }}
-                            </li>
-                        </ul>
-                    </VueFinalModal>
-                    <button class="bg-gray-300 rounded px-2 cursor-pointer" @click="day.showNo = true">
-                        <span class="sr-only">No</span>
-                        <span class="font-bold rounded tracking-widest whitespace-nowrap">
-                            <span class="">{{ valueCountOnDate(day.date.format(dateFormat), 'no') }}</span>
-                            <i class="far fa-circle-xmark inline-block ml-px text-xs"></i>
-                        </span>
-                    </button>
-                    <VueFinalModal
-                        v-model="day.showNo" class="flex justify-center items-center"
-                        content-class="bg-white p-5 rounded relative">
-                        <button class="absolute top-0 right-1 cursor-pointer" @click="day.showNo = false" aria-label="Close Modal"><i class="fa fa-xmark"></i></button>
-                        <h2 class="text-lg font-semibold tracking-wider text-left">Not available on {{ day.date.format('ddd Do MMMM') }}</h2>
-                        <ul class="list-disc list-inside">
-                            <li v-for="attendee in valueOnDateArray(day.date.format(dateFormat), 'no')">
-                                {{ attendee.name }}
-                            </li>
-                        </ul>
-                    </VueFinalModal>
                 </div>
-                <div v-else-if="mode == 'add'" class="mt-3">
-                    <div class="text-xl flex items-center justify-around">
+                <div v-else-if="mode == 'add'" class="px-3 py-4 border border-gray-200 rounded relative">
+                    <p class="absolute top-0 right-1 text-xs opacity-50">
+                        <span class="sr-only">Year </span>
+                        {{ day.date.format('YYYY') }}
+                    </p>
+                    <p class="text-center font-semibold tracking-wide">
+                        {{ day.date.format('ddd Do MMMM') }}
+                    </p>
+                    <div class="text-xl flex items-center justify-around mt-3">
                         <label class="cursor-pointer">
                             <input type="radio" :name="'availability_' + day.date.format('YYYYMMDD')"
                             class="peer sr-only" v-model="availability.dates[day.date.format(dateFormat)]" value="yes">
                             <span class="px-2 py-1 rounded text-green-600 peer-checked:bg-green-600 peer-checked:text-white">
-                                <i class="far fa-circle-check"></i>
+                                <i class="far fa-circle-check" aria-hidden="true"></i>
                             </span>
                             <span class="sr-only">Available</span>
                         </label>
@@ -169,7 +168,7 @@ const valueOnDateArray = (date, value) => {
                             <input type="radio" :name="'availability_' + day.date.format('YYYYMMDD')"
                             class="peer sr-only" v-model="availability.dates[day.date.format(dateFormat)]" value="maybe">
                             <span class="px-2 py-1 rounded text-yellow-500 peer-checked:bg-yellow-400 peer-checked:text-gray-800">
-                                <i class="far fa-circle-question"></i>
+                                <i class="far fa-circle-question" aria-hidden="true"></i>
                             </span>
                             <span class="sr-only">Maybe Available</span>
                         </label>
@@ -177,7 +176,7 @@ const valueOnDateArray = (date, value) => {
                             <input type="radio" :name="'availability_' + day.date.format('YYYYMMDD')"
                             class="peer sr-only" v-model="availability.dates[day.date.format(dateFormat)]" value="no">
                             <span class="px-2 py-1 rounded text-gray-400 peer-checked:bg-gray-300 peer-checked:text-gray-800">
-                                <i class="far fa-circle-xmark"></i>
+                                <i class="far fa-circle-xmark" aria-hidden="true"></i>
                             </span>
                             <span class="sr-only">Not Available</span>
                         </label>
