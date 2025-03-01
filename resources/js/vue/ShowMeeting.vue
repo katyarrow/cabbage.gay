@@ -37,8 +37,7 @@ const meeting = ref({
 const attendees = ref([]);
 const symbolMode = ref(false);
 const showDifferentTimezoneInfo = ref(false);
-// const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const userTimezone = 'NZ';
+const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const parseAttendees = (encryptedAttendeeArray) => {
     return encryptedAttendeeArray.map(a => {
