@@ -20,9 +20,11 @@ class MeetingAttendeeController extends Controller
         return MeetingAttendeeResource::collection($meeting->meetingAttendees);
     }
 
-    public function destroy(MeetingAttendee $attendee, MeetingAttendeeDestroyRequest $request) {
+    public function destroy(MeetingAttendee $attendee, MeetingAttendeeDestroyRequest $request)
+    {
         $meeting = $attendee->meeting;
         $request->delete($attendee);
+
         return MeetingAttendeeResource::collection($meeting->meetingAttendees()->get());
     }
 }

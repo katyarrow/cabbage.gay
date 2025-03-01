@@ -7,12 +7,15 @@ import VLabel from './components/VLabel.vue';
 import VLegend from './components/VLegend.vue';
 import VButton from './components/VButton.vue';
 import VAlert from './components/VAlert.vue';
-import { ref, watch } from 'vue';
+import { ref, useTemplateRef, watch } from 'vue';
 import { useValidation } from './composables/validation';
 import moment from 'moment-timezone';
+import PowCaptcha from './components/PowCaptcha.vue';
+import VError from './components/VError.vue';
 
 const props = defineProps({
-    'submitRoute': String,
+    submitRoute: String,
+    captchaChallengeRoute: String,
 });
 
 const { validate } = useValidation();
@@ -22,6 +25,7 @@ const times = [
     '12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00',
 ];
 const generatingStatus = ref(null);
+const captchaVerifying = ref(false);
 const globalError = ref(null);
 const formErrors = ref({});
 const form = ref({
@@ -35,7 +39,14 @@ const form = ref({
     destroy_at: moment().add(6, 'months').format('YYYY-MM-DD'),
 });
 
-const submit = () => {
+const captcha = useTemplateRef('captcha');
+
+const verifyCaptcha = () => {
+    captchaVerifying.value = true;
+    captcha.value.completeCaptcha();
+}
+
+const submit = (captchaToken) => {
     if(!validateForm()) {
         return;
     }
@@ -59,6 +70,7 @@ const submit = () => {
         public_key: crypt.publicKey,
         data: crypt.encrypt(JSON.stringify(dataForm)),
         destroy_at: form.value.destroy_at,
+        captcha: captchaToken,
     };
 
     encryptedForm.signature = crypt.getSignatureFromFormObject(['data', 'destroy_at'], encryptedForm);
@@ -74,6 +86,12 @@ const submit = () => {
             console.log(error);
             globalError.value = 'Something went wrong.';
             generatingStatus.value = null;
+            if(error.response && error.response.data.errors) {
+                Object.entries(error.response.data.errors).forEach(([k, v]) => {
+                    formErrors.value[k] = v[0];
+                });
+                console.log(formErrors);
+            }
         });
 }
 
@@ -101,7 +119,7 @@ const timeLt = (time1, time2) => {
 
 <template>
     <h1 class="text-3xl font-semibold tracking-wider text-center mb-5">Create a Meeting</h1>
-    <form class="flex flex-col max-w-lg mx-auto mb-10" @submit.prevent="submit" aria-live="polite">
+    <form class="flex flex-col max-w-lg mx-auto mb-10" @submit.prevent="verifyCaptcha" aria-live="polite">
         <VAlert v-model="globalError"></VAlert>
         <div class="my-5">
             <VLabel class="text-left sr-only" for="name">Meeting Name</VLabel>
@@ -178,7 +196,17 @@ const timeLt = (time1, time2) => {
         </fieldset>
 
         <div class="text-right mt-10">
-            <VButton type="submit" size="lg">Create!</VButton>
+            <div class="text-center flex justify-end">
+                <PowCaptcha
+                    ref="captcha"
+                    :challenge-route="props.captchaChallengeRoute"
+                    @completed="submit"
+                ></PowCaptcha>
+            </div>
+            <VButton v-if="!captchaVerifying" type="submit" size="lg">Create!</VButton>
+        </div>
+        <div class="text-center">
+            <VError v-model="formErrors.captcha"></VError>
         </div>
     </form>
     <div v-if="generatingStatus" class="fixed inset-0 bg-gray-100 flex flex-col items-center justify-center font-semibold text-2xl" role="alert">

@@ -24,8 +24,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(ConnectionInterface $connection): void
     {
         Session::extend('database-simple', function (Application $app) use ($connection) {
-            $table   = \Config::get('session.table');
+            $table = \Config::get('session.table');
             $minutes = \Config::get('session.lifetime');
+
             return new SimpleDatabaseSessionHandler($connection, $table, $minutes);
         });
     }

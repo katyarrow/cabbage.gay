@@ -1,20 +1,20 @@
 <script setup>
 
 import VInput from '../VInput.vue';
-import VCheckbox from '../VCheckbox.vue';
 import VSelect from '../VSelect.vue';
 import VLabel from '../VLabel.vue';
 import VButton from '../VButton.vue';
 import VAlert from '../VAlert.vue';
 import moment from 'moment';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
-import { VueFinalModal } from 'vue-final-modal';
 
 const props = defineProps({
     meeting: Object,
     mode: String,
     symbolMode: Boolean,
     attendees: Array,
+    showDifferentTimezoneInfo: Boolean,
+    userTimezone: String,
 });
 
 const emit = defineEmits(['submit']);
@@ -44,6 +44,7 @@ const paginatedDays = computed(() => {
         isLastPage: (page.value + 1) * perPage.value >= days.value.length,
         currentPage: page.value,
         lastPage: Math.ceil(days.value.length / perPage.value),
+        totalPages: Math.ceil(days.value.length / perPage.value),
     };
 });
 
@@ -72,10 +73,10 @@ const updatePageSize = () => {
 }
 
 const generateDays = () => {
-    const startDate = moment(props.meeting.start_date, dateFormat);
-    const endDate = moment(props.meeting.end_date, dateFormat);
-    const startTime = moment(props.meeting.start_time, timeFormat);
-    const endTime = moment(props.meeting.end_time, timeFormat);
+    const startDate = moment.tz(props.meeting.start_date, dateFormat, props.meeting.timezone);
+    const endDate = moment.tz(props.meeting.end_date, dateFormat, props.meeting.timezone);
+    const startTime = moment.tz(props.meeting.start_time, timeFormat, props.meeting.timezone);
+    const endTime = moment.tz(props.meeting.end_time, timeFormat, props.meeting.timezone);
 
     if(!startDate.isValid() || !endDate.isValid() || !startTime.isValid() || !endTime.isValid()) {
         generalError.value = 'Invalid dates or times on meeting.';
@@ -96,8 +97,15 @@ const generateDays = () => {
 
     let currTime = startTime.clone();
     while(currTime < endTime) {
+        let userTime = currTime.clone().tz(props.userTimezone);
+        let time = currTime.clone();
+        let hourDiff = time.hour() + moment.tz(userTime.format('YYYY-MM-DD HH:mm'), props.meeting.timezone)
+                                    .diff(moment.tz(time.format('YYYY-MM-DD HH:mm'), props.meeting.timezone), 'hours');
+        let tzTimeDiffInDays = hourDiff < 0 ? '-1' : (hourDiff > 23 ? '+1' : null);
         times.value.push({
-            time: currTime.clone(),
+            time: time,
+            userTime: userTime,
+            tzTimeDiffInDays: tzTimeDiffInDays,
         });
         currTime.add(30, 'minutes');
     }
@@ -108,8 +116,9 @@ const generateFreshAvailability = () => {
     availability.value.name = null;
 }
 
-const addDateAndTime = (date, time) => {
-    return moment(date.format(dateFormat) + ' ' + time.format(timeFormat), dateTimeFormat);
+const addDateAndTime = (date, time, tz) => {
+    tz = tz || props.meeting.timezone;
+    return moment.tz(date.format(dateFormat) + ' ' + time.format(timeFormat), dateTimeFormat, tz);
 }
 
 const addOrUpdateAvailability = (dateIndex, timeIndex, value) => {
@@ -174,9 +183,9 @@ const gridSquareDisplayInfo = (date, time) => {
     let valuesMaybe = values.filter(v => v == 'maybe');
     let attendeesMaybe = attendees.filter(a => a.dates[datetime] == 'maybe');
     let attendeesNo = attendees.filter(a => !(a.dates[datetime] == 'yes' || a.dates[datetime] == 'maybe'));
-    let ratio = Math.round((valuesMaybe.length / Math.max(1, valuesPositive.length)) * 4 ) / 4;
-    let inverseRatio = 1 - ratio;
-    let opacity = Math.round((valuesPositive.length / attendees.length) * 100) / 100;
+    let ratio = values.length > 0 ? Math.round((valuesMaybe.length / Math.max(1, valuesPositive.length)) * 4 ) / 4 : 0;
+    let inverseRatio = values.length > 0 ? 1 - ratio : 0;
+    let opacity = attendees.length > 0 ? Math.round((valuesPositive.length / attendees.length) * 100) / 100 : 0;
     let gradientColor = gradient[Math.round(ratio * (gradient.length - 1))];
 
     let info = {
@@ -298,7 +307,22 @@ const submit = () => {
                 <tbody>
                     <tr v-for="(time, timeIndex) in times" draggable="false">
                         <th scope="row" class="text-xs md:text-sm text-right pr-2 w-2 align-top font-normal">
-                            <span :class="[timeIndex % 2 == 0 ? '' : 'sr-only']" class="select-none">
+                            <span v-if="showDifferentTimezoneInfo" class="select-none text-nowrap">
+                                <time v-if="timeIndex % 2 == 0">
+                                    {{ time.userTime.format('h a') }}
+                                    <span v-if="time.tzTimeDiffInDays != null" class="sr-only">
+                                        {{ time.tzTimeDiffInDays }} day
+                                    </span>
+                                </time>
+                                <time v-else>
+                                    <span class="sr-only">{{ time.userTime.format('h:mm a') }}</span>
+                                    <span v-if="time.tzTimeDiffInDays != null"
+                                        class="inline-block text-xs bg-yellow-200 text-gray-700 rounded-full px-1">
+                                        {{ time.tzTimeDiffInDays }} day
+                                    </span>
+                                </time>
+                            </span>
+                            <span v-else :class="[timeIndex % 2 == 0 ? '' : 'sr-only']" class="select-none text-nowrap">
                                 <time v-if="timeIndex % 2 == 0">{{ time.time.format('h a') }}</time>
                                 <time v-else>{{ time.time.format('h:mm a') }}</time>
                             </span>
@@ -431,7 +455,7 @@ const submit = () => {
                 </VSelect>
             </div>
         </div>
-        <div class="flex gap-5 justify-center items-center" v-if="mode == 'add'">
+        <div class="flex gap-5 justify-center items-center" v-if="mode == 'add' && paginatedDays.totalPages > 1">
             <VButton type="button" size="sm" :disabled="paginatedDays.isFirstPage" @click="page--" class="flex-1 md:flex-auto">
                 <i class="fa fa-chevron-left"></i> Previous <span class="sr-only">Page</span>
             </VButton>

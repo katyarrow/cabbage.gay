@@ -9,7 +9,8 @@ class MeetingAttendee extends Model
     public $timestamps = false;
 
     // RELATIONSHIPS
-    public function meeting() {
+    public function meeting()
+    {
         return $this->belongsTo(Meeting::class);
     }
 

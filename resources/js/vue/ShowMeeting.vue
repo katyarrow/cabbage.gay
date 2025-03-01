@@ -36,6 +36,9 @@ const meeting = ref({
 
 const attendees = ref([]);
 const symbolMode = ref(false);
+const showDifferentTimezoneInfo = ref(false);
+// const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const userTimezone = 'NZ';
 
 const parseAttendees = (encryptedAttendeeArray) => {
     return encryptedAttendeeArray.map(a => {
@@ -127,32 +130,54 @@ const copyLink = () => {
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="text-gray-600 whitespace-nowrap">
-                            {{ moment(meeting.start_time, 'HH:mm').format('h a') }}
+                            {{ moment.tz(meeting.start_time, 'HH:mm', meeting.timezone).format('h a') }}
                             -
-                            {{ moment(meeting.end_time, 'HH:mm').format('h a') }}
+                            {{ moment.tz(meeting.end_time, 'HH:mm', meeting.timezone).format('h a') }}
                             ({{ meeting.timezone }})
                         </span>
-                        <VButton size="xs" @click="copyLink">
+                        <VButton size="xs" @click="copyLink" class="hidden md:block">
                             <span v-if="!shared">Share <i class="fas fa-share"></i></span>
                             <span v-else>Copied <i class="fas fa-check"></i></span>
                         </VButton>
                     </div>
                 </div>
                 <div class="flex flex-col justify-start items-end gap-2">
-                    <VButton size="sm" v-if="mode == 'show'" @click="mode = 'add'">Add Availability</VButton>
+                    <VButton size="sm" v-if="mode == 'show'" @click="mode = 'add'">Add&nbsp;Availability</VButton>
                     <VButton size="sm" v-if="mode == 'add'" color="danger" @click="mode = 'show'">Cancel</VButton>
-                    <VLabel class="select-none" v-if="!meeting.entire_period">
+                    <VLabel class="select-none hidden md:block" v-if="!meeting.entire_period">
                         Symbol Mode
                         <VCheckbox v-model="symbolMode"></VCheckbox>
                     </VLabel>
                 </div>
+                <div class="flex flex-col gap-2 items-start">
+                    <div v-if="meeting.timezone !== userTimezone" class="flex items-center">
+                        <VLabel>
+                            <span class="normal-case mr-1">Show {{ userTimezone }}</span>
+                            <VCheckbox v-model="showDifferentTimezoneInfo"></VCheckbox>
+                        </VLabel>
+                    </div>
+                    <VButton size="xs" @click="copyLink" class="block md:hidden">
+                        <span v-if="!shared">Share <i class="fas fa-share"></i></span>
+                        <span v-else>Copied <i class="fas fa-check"></i></span>
+                    </VButton>
+                </div>
+                <div>
+                    <div class="text-right">
+                        <VLabel class="select-none block md:hidden" v-if="!meeting.entire_period">
+                            Symbol Mode
+                            <VCheckbox v-model="symbolMode"></VCheckbox>
+                        </VLabel>
+                    </div>
+                </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
-                <div class="col-span-4">
+                <div :class="[mode == 'show' ? 'col-span-4' : 'col-span-full']">
                     <EntirePeriod
                         v-if="meeting.entire_period"
                         :meeting="meeting"
                         :attendees="attendees"
+                        :show-different-timezone-info="showDifferentTimezoneInfo"
+                        :user-timezone="userTimezone"
                         v-model:selected-attendee="selectedAttendee"
                         v-model:selected-day="selectedDay"
                         :mode="mode"
@@ -164,13 +189,15 @@ const copyLink = () => {
                         :attendees="attendees"
                         :mode="mode"
                         :symbol-mode="symbolMode"
+                        :show-different-timezone-info="showDifferentTimezoneInfo"
+                        :user-timezone="userTimezone"
                         v-model:selected-attendee="selectedAttendee"
                         v-model:selected-day="selectedDay"
                         @submit="onAttendeeSubmit"
                     ></OptionalPeriod>
                 </div>
                 <div :class="[meeting.entire_period ? '' : 'my-5 md:mt-10']" v-if="mode == 'show'">
-                    <h2 class="text-lg font-semibold tracking-wider text-left text-nowrap">Responders ({{ attendees.length }})</h2>
+                    <h2 class="text-lg font-semibold tracking-wider text-left text-nowrap">Responses ({{ attendees.length }})</h2>
                     <ul class="list-disc list-inside flex flex-col gap-3">
                         <li v-for="attendee in attendees">
                             <span

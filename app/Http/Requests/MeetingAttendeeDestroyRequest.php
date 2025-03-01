@@ -2,10 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Http\Services\CryptService;
 use App\Models\MeetingAttendee;
-use App\Rules\EncryptedMax;
-use App\Rules\Hexadecimal;
 use App\Rules\SignsRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -27,7 +24,7 @@ class MeetingAttendeeDestroyRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'destroy_challenge' => ['required', 'in:' . $this->attendee->destroy_challenge],
+            'destroy_challenge' => ['required', 'in:'.$this->attendee->destroy_challenge],
         ];
 
         return array_merge($rules, [

@@ -8,6 +8,7 @@ use App\Rules\EncryptedMax;
 use App\Rules\EncryptedSize;
 use App\Rules\Hexadecimal;
 use App\Rules\SignsRequest;
+use App\Rules\VerifiesCaptchaToken;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -38,6 +39,7 @@ class MeetingRequest extends FormRequest
             'private_key' => ['required', new Hexadecimal, new EncryptedSize(CryptService::ENCRYPTED_PRIVATE_KEY_LENGTH)],
             'public_key' => ['required', new Hexadecimal, new EncryptedSize(CryptService::UNENCRYPTED_PUBLIC_KEY_LENGTH)],
             'signature' => ['required', new SignsRequest(array_keys($rules), $this->public_key)],
+            'captcha' => [new VerifiesCaptchaToken],
         ]);
     }
 

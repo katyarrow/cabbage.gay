@@ -1,7 +1,7 @@
 <?php
 
 use App\Console\Commands\DeleteExpiredMeetings;
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\RemoveExpiredCaptchas;
 
 Schedule::command(DeleteExpiredMeetings::class)->hourly();
+Schedule::command(RemoveExpiredCaptchas::class)->everyMinute();

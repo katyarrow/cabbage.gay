@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MeetingAttendeeController;
@@ -12,3 +13,5 @@ Route::post('/meeting', [MeetingController::class, 'store'])->name('meeting.stor
 Route::get('/meeting/{meeting:identifier}', [MeetingController::class, 'show'])->name('meeting.show');
 Route::post('/meeting/{meeting:identifier}/attendee/store', [MeetingAttendeeController::class, 'store'])->name('meeting.attendee.store');
 Route::post('/meeting/attendee/{attendee:identifier}/destroy', [MeetingAttendeeController::class, 'destroy'])->name('meeting.attendee.destroy');
+Route::get('/captcha/get-challenge', [CaptchaController::class, 'index'])->name('captcha.index');
+Route::post('/captcha/verify/{captcha}', [CaptchaController::class, 'verify'])->name('captcha.verify');

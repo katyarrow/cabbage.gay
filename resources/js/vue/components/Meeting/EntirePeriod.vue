@@ -4,6 +4,7 @@ import VInput from '../VInput.vue';
 import VLabel from '../VLabel.vue';
 import VButton from '../VButton.vue';
 import VAlert from '../VAlert.vue';
+import EntirePeriodDateDisplay from './EntirePeriodDateDisplay.vue';
 import moment from 'moment';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 
@@ -11,6 +12,8 @@ const props = defineProps({
     meeting: Object,
     mode: String,
     attendees: Array,
+    showDifferentTimezoneInfo: Boolean,
+    userTimezone: String,
 });
 
 const emit = defineEmits(['submit']);
@@ -26,8 +29,8 @@ const availability = ref({
 });
 
 const generateDays = () => {
-    const startDate = moment(props.meeting.start_date, dateFormat);
-    const endDate = moment(props.meeting.end_date, dateFormat);
+    const startDate = moment.tz(props.meeting.start_date, dateFormat, props.meeting.timezone);
+    const endDate = moment.tz(props.meeting.end_date, dateFormat, props.meeting.timezone);
     const current = startDate.clone();
 
     if(!startDate.isValid() || !endDate.isValid()) {
@@ -39,8 +42,16 @@ const generateDays = () => {
         return;
     }
     while(current <= endDate) {
+        let date = current.clone();
+        let userDateStart = moment.tz(date.format('YYYY-MM-DD ' + props.meeting.start_time), 'YYYY-MM-DD HH:mm', props.meeting.timezone).tz(props.userTimezone);
+        let userDateEnd = moment.tz(date.format('YYYY-MM-DD ' + props.meeting.end_time), 'YYYY-MM-DD HH:mm', props.meeting.timezone).tz(props.userTimezone);
+        let userStartAndEndOnDifferentDays = userDateStart.day() != userDateEnd.day();
+        let userStartAndEndOnDifferentYears = userDateStart.year() != userDateEnd.year();
         days.value.push({
-            date: current.clone(),
+            date: date,
+            userDateStart: userDateStart,
+            userDateEnd: userDateEnd,
+            userStartAndEndOnDifferentDays: userStartAndEndOnDifferentDays,
         });
         current.add(1, 'day');
     }
@@ -112,13 +123,10 @@ const toggleDay = (day) => {
                     class="px-3 py-4 border rounded relative cursor-pointer hover:bg-gray-50 focus:bg-gray-50 transition-colors"
                     :class="[selectedDayIsSame(day) ? 'border-green-600' : 'border-gray-200']"
                     v-if="mode == 'show'">
-                    <p class="absolute top-0 right-1 text-xs opacity-50">
-                        <span class="sr-only">Year </span>
-                        {{ day.date.format('YYYY') }}
-                    </p>
-                    <p class="text-center font-semibold tracking-wide">
-                        {{ day.date.format('ddd Do MMMM') }}
-                    </p>
+                    <EntirePeriodDateDisplay
+                        :day="day"
+                        :show-different-timezone-info="props.showDifferentTimezoneInfo"
+                    ></EntirePeriodDateDisplay>
                     <div class="flex items-center justify-center gap-3 mt-3 text-center text-sm">
                         <div class="bg-green-600 rounded px-2 text-white cursor-pointer">
                             <span class="sr-only">Yes</span>
@@ -148,13 +156,10 @@ const toggleDay = (day) => {
                     </button>
                 </div>
                 <div v-else-if="mode == 'add'" class="px-3 py-4 border border-gray-200 rounded relative">
-                    <p class="absolute top-0 right-1 text-xs opacity-50">
-                        <span class="sr-only">Year </span>
-                        {{ day.date.format('YYYY') }}
-                    </p>
-                    <p class="text-center font-semibold tracking-wide">
-                        {{ day.date.format('ddd Do MMMM') }}
-                    </p>
+                    <EntirePeriodDateDisplay
+                        :day="day"
+                        :show-different-timezone-info="props.showDifferentTimezoneInfo"
+                    ></EntirePeriodDateDisplay>
                     <div class="text-xl flex items-center justify-around mt-3">
                         <label class="cursor-pointer">
                             <input type="radio" :name="'availability_' + day.date.format('YYYYMMDD')"
