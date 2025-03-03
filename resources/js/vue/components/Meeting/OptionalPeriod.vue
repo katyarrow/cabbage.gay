@@ -29,7 +29,7 @@ const days = ref([]);
 const times = ref([]);
 const page = ref(0);
 const perPage = ref(7);
-const displayType = ref('simple');
+const displayType = ref('proportion');
 const availability = ref({
     name: null,
     dates: {},
@@ -338,9 +338,6 @@ const submit = () => {
                         >
                             <div v-if="mode == 'add'" class="grid-square h-full flex items-center justify-center relative"
                                 draggable="false"
-                                @pointerdown="startDrag(dateIndex, timeIndex)"
-                                @mouseenter="hoverEnter(dateIndex, timeIndex)"
-                                @pointermove="pointerMove"
                                 :data-dateindex="dateIndex"
                                 :data-timeindex="timeIndex"
                                 :class="[
@@ -351,7 +348,12 @@ const submit = () => {
                                     <i class="far fa-circle-question" v-else-if="getAvailability(day.date, time.time) == 'maybe'" aria-label="Maybe"></i>
                                     <span v-else class="sr-only">No</span>
                                 </div>
-                                <button type="button" class="absolute inset-0" @click="startDrag(dateIndex, timeIndex, true)">
+                                <button type="button" class="absolute inset-0"
+                                    @keydown.enter="startDrag(dateIndex, timeIndex, true)"
+                                    @keydown.space="startDrag(dateIndex, timeIndex, true)"
+                                    @pointerdown="startDrag(dateIndex, timeIndex)"
+                                    @mouseenter="hoverEnter(dateIndex, timeIndex)"
+                                    @pointermove="pointerMove">
                                     <span class="sr-only" v-if="getAvailability(day.date, time.time) == 'yes'">Change to maybe</span>
                                     <span class="sr-only" v-else="getAvailability(day.date, time.time) == 'maybe'">Change to no</span>
                                     <span class="sr-only" v-else>Change to yes</span>

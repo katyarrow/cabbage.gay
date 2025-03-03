@@ -36,7 +36,11 @@ const form = ref({
     end_date: moment().add(6, 'day').format('YYYY-MM-DD'),
     start_time: '09:00',
     end_time: '17:00',
-    destroy_at: moment().add(6, 'months').format('YYYY-MM-DD'),
+    destroy_at: moment().add(6, 'day').format('YYYY-MM-DD'),
+});
+
+watch(() => form.value.end_date, () => {
+    form.value.destroy_at = form.value.end_date;
 });
 
 const captcha = useTemplateRef('captcha');

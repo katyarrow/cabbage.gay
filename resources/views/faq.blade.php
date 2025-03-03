@@ -52,7 +52,8 @@
         <li class="my-10">
             <h2 class="text-xl font-semibold tracking-wider text-left">5. Is this a paid service?</h2>
             <p>
-                No, this site will not be paywalled or make money off you in any other way.
+                No, this site will not be paywalled or make money off you in any other way
+                (though a donation link may be set up in future to cover maintenance and upkeep).
             </p>
         </li>
         <li class="my-10">
