@@ -3,6 +3,8 @@ import { nextTick, onMounted, ref, useTemplateRef } from 'vue';
 
 const props = defineProps({
     challengeRoute: String,
+    solveCaptchaButton: {type: Boolean, default: false},
+    usedInForm: {type: Boolean, default: false},
 });
 
 const emit = defineEmits([
@@ -10,9 +12,10 @@ const emit = defineEmits([
     'failed',
 ]);
 
-const percentRemaining = ref(100);
+const percentCompleted = ref(100);
 const started = ref(false);
 const completed = ref(false);
+const solvedToken = ref(null);
 const error = ref(false);
 
 const completeCaptcha = async () => {
@@ -22,7 +25,7 @@ const completeCaptcha = async () => {
     let pow = new POW();
     pow.calculatePowAnswers(captcha);
     let interval = setInterval(() => {
-        percentRemaining.value = (pow.currentTotalTries / pow.estimatedTotalTries) * 100;
+        percentCompleted.value = (pow.currentTotalTries / pow.estimatedTotalTries) * 100;
         if(pow.isFinished() && pow.hasAllAnswers()) {
             verifyCaptcha(captcha, pow);
             clearInterval(interval)
@@ -43,7 +46,10 @@ const verifyCaptcha = async (captcha, pow) => {
         });
         if(response.data.success) {
             completed.value = true;
-            emit('completed', response.data.solved_token);
+            solvedToken.value = response.data.token
+            
+            emit('completed', solvedToken.value);
+            percentCompleted.value = 100;
         } else {
             error.value = true;
         }
@@ -76,10 +82,15 @@ defineExpose({
                 <span v-else>Verifying</span>
             </span>
             <span class="col-span-full relative rounded overflow-hidden h-3 bg-gray-50 w-full">
-                <div class="h-full bg-green-600" :style="{width: percentRemaining + '%'}">
-                    <span class="sr-only">{{ percentRemaining }}%</span>
+                <div class="h-full bg-green-600" :style="{width: percentCompleted + '%'}">
+                    <span class="sr-only">{{ percentCompleted }}%</span>
                 </div>
             </span>
         </div>
     </div>
+    <div class="p-2 rounded shadow border border-green-600 font-medium w-3xs flex items-center justify-between" v-if="!started && solveCaptchaButton">
+        Solve Captcha
+        <button type="button" class="border rounded-lg h-6 w-6" aria-label="Solve Captcha" @click="completeCaptcha"></button>
+    </div>
+    <input v-if="completed && props.usedInForm" type="hidden" name="captcha" :value="solvedToken">
 </template>
