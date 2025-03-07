@@ -70,6 +70,10 @@ onMounted(async() => {
     meeting.value.attendee_store_route = props.meeting.attendee_store_route;
     attendees.value = parseAttendees(props.meeting.attendees)
     loaded.value = true;
+
+    let meetingTitle = meeting.value.name.substring(0, 100);
+    meetingTitle = meetingTitle.length < meeting.value.name.length ? meetingTitle + '...' : meetingTitle;
+    document.getElementsByTagName('title')[0].innerHTML = document.title.replace('LOADING', meetingTitle);
 });
 
 const onAttendeeSubmit = (attendeeString) => {

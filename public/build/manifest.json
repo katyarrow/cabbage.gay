@@ -1,0 +1,76 @@
+{
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf": {
+    "file": "assets/fa-brands-400-D1LuMI3I.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2": {
+    "file": "assets/fa-brands-400-D_cYUPeE.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.ttf": {
+    "file": "assets/fa-regular-400-DZaxPHgR.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2": {
+    "file": "assets/fa-regular-400-BjRzuEpd.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf": {
+    "file": "assets/fa-solid-900-D0aA9rwL.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {
+    "file": "assets/fa-solid-900-CTAAxXor.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.ttf": {
+    "file": "assets/fa-v4compatibility-CCth-dXg.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2": {
+    "file": "assets/fa-v4compatibility-C9RhG_FT.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-BQZ6rPGC.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/fonts/advent-pro/advent-pro.bold.ttf": {
+    "file": "assets/advent-pro.bold-eyBDkl5Y.ttf",
+    "src": "resources/fonts/advent-pro/advent-pro.bold.ttf"
+  },
+  "resources/fonts/advent-pro/advent-pro.extralight.ttf": {
+    "file": "assets/advent-pro.extralight-BTjGBvH3.ttf",
+    "src": "resources/fonts/advent-pro/advent-pro.extralight.ttf"
+  },
+  "resources/fonts/advent-pro/advent-pro.light.ttf": {
+    "file": "assets/advent-pro.light-iQR7n2Hj.ttf",
+    "src": "resources/fonts/advent-pro/advent-pro.light.ttf"
+  },
+  "resources/fonts/advent-pro/advent-pro.medium.ttf": {
+    "file": "assets/advent-pro.medium-CQJGUpnt.ttf",
+    "src": "resources/fonts/advent-pro/advent-pro.medium.ttf"
+  },
+  "resources/fonts/advent-pro/advent-pro.regular.ttf": {
+    "file": "assets/advent-pro.regular-CUG2YBIH.ttf",
+    "src": "resources/fonts/advent-pro/advent-pro.regular.ttf"
+  },
+  "resources/fonts/advent-pro/advent-pro.semibold.ttf": {
+    "file": "assets/advent-pro.semibold-BEil5swF.ttf",
+    "src": "resources/fonts/advent-pro/advent-pro.semibold.ttf"
+  },
+  "resources/fonts/advent-pro/advent-pro.thin.ttf": {
+    "file": "assets/advent-pro.thin-DES-Tbd_.ttf",
+    "src": "resources/fonts/advent-pro/advent-pro.thin.ttf"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-8Q91T1Cn.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "css": [
+      "assets/app-DqeZVk2a.css"
+    ]
+  }
+}
