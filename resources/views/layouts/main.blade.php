@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-GB">
     <head>
         <title>{{ $attributes->has('title') ? $attributes->get('title') . ' - ' : '' }}{{ config('app.name') }}</title>
         <meta charset="utf-8" />
