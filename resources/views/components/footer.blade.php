@@ -4,7 +4,7 @@
     We do not store data on you beyond what is required for the sites functioning.<br/>
     Data we store includes:
     <ul class="list-disc">
-        <li class="list-inside">Meeting data: This is encrypted wherever possibke on your machine and stored on the server.</li>
+        <li class="list-inside">Meeting data: This is encrypted wherever possible on your machine and stored on the server.</li>
         <li class="list-inside">Encryption keys: used to verify data (encrypted where appropriate).</li>
         <li class="list-inside">Session cookies: used for cross-site request forgery prevention.</li>
     </ul>
