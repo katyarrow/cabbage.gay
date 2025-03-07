@@ -18,7 +18,7 @@ class VerifiesCaptchaToken implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $captcha = PowCaptcha::whereNotNull('solved_token')->where('solved_token', $value)->first();
-        if ($captcha) {
+        if (!$captcha) {
             $fail('Invalid Captcha');
 
             return;

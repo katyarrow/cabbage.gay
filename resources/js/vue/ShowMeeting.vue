@@ -29,6 +29,7 @@ const meeting = ref({
     entire_period: null,
     start_date: null,
     end_date: null,
+    dates: null,
     start_time: null,
     end_time: null,
     destroy_at: null,

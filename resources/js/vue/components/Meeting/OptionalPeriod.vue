@@ -77,6 +77,7 @@ const generateDays = () => {
     const endDate = moment.tz(props.meeting.end_date, dateFormat, props.meeting.timezone);
     const startTime = moment.tz(props.meeting.start_time, timeFormat, props.meeting.timezone);
     const endTime = moment.tz(props.meeting.end_time, timeFormat, props.meeting.timezone);
+    const dates = props.meeting.dates;
 
     if(!startDate.isValid() || !endDate.isValid() || !startTime.isValid() || !endTime.isValid()) {
         generalError.value = 'Invalid dates or times on meeting.';
@@ -89,9 +90,11 @@ const generateDays = () => {
 
     const currDate = startDate.clone();
     while(currDate <= endDate) {
-        days.value.push({
-            date: currDate.clone(),
-        });
+        if(dates && dates.length && dates.includes(currDate.format(dateFormat))) {
+            days.value.push({
+                date: currDate.clone(),
+            });
+        }
         currDate.add(1, 'day');
     }
 

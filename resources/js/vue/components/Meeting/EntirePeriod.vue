@@ -32,6 +32,7 @@ const generateDays = () => {
     const startDate = moment.tz(props.meeting.start_date, dateFormat, props.meeting.timezone);
     const endDate = moment.tz(props.meeting.end_date, dateFormat, props.meeting.timezone);
     const current = startDate.clone();
+    const dates = props.meeting.dates;
 
     if(!startDate.isValid() || !endDate.isValid()) {
         generalError.value = 'Invalid dates or times on meeting.';
@@ -42,17 +43,19 @@ const generateDays = () => {
         return;
     }
     while(current <= endDate) {
-        let date = current.clone();
-        let userDateStart = moment.tz(date.format('YYYY-MM-DD ' + props.meeting.start_time), 'YYYY-MM-DD HH:mm', props.meeting.timezone).tz(props.userTimezone);
-        let userDateEnd = moment.tz(date.format('YYYY-MM-DD ' + props.meeting.end_time), 'YYYY-MM-DD HH:mm', props.meeting.timezone).tz(props.userTimezone);
-        let userStartAndEndOnDifferentDays = userDateStart.day() != userDateEnd.day();
-        let userStartAndEndOnDifferentYears = userDateStart.year() != userDateEnd.year();
-        days.value.push({
-            date: date,
-            userDateStart: userDateStart,
-            userDateEnd: userDateEnd,
-            userStartAndEndOnDifferentDays: userStartAndEndOnDifferentDays,
-        });
+        if(dates && dates.length && dates.includes(current.format(dateFormat))) {
+            let date = current.clone();
+            let userDateStart = moment.tz(date.format('YYYY-MM-DD ' + props.meeting.start_time), 'YYYY-MM-DD HH:mm', props.meeting.timezone).tz(props.userTimezone);
+            let userDateEnd = moment.tz(date.format('YYYY-MM-DD ' + props.meeting.end_time), 'YYYY-MM-DD HH:mm', props.meeting.timezone).tz(props.userTimezone);
+            let userStartAndEndOnDifferentDays = userDateStart.day() != userDateEnd.day();
+            let userStartAndEndOnDifferentYears = userDateStart.year() != userDateEnd.year();
+            days.value.push({
+                date: date,
+                userDateStart: userDateStart,
+                userDateEnd: userDateEnd,
+                userStartAndEndOnDifferentDays: userStartAndEndOnDifferentDays,
+            });
+        }
         current.add(1, 'day');
     }
 }

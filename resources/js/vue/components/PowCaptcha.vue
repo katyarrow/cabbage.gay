@@ -12,13 +12,17 @@ const emit = defineEmits([
     'failed',
 ]);
 
-const percentCompleted = ref(100);
+const percentCompleted = ref(0);
 const started = ref(false);
 const completed = ref(false);
 const solvedToken = ref(null);
 const error = ref(false);
 
 const completeCaptcha = async () => {
+    percentCompleted.value = 0;
+    completed.value = false;
+    solvedToken.value = null;
+    error.value = false;
     let response = await axios.get(props.challengeRoute);
     let captcha = response.data.data;
     started.value = true;
@@ -47,7 +51,6 @@ const verifyCaptcha = async (captcha, pow) => {
         if(response.data.success) {
             completed.value = true;
             solvedToken.value = response.data.token
-            
             emit('completed', solvedToken.value);
             percentCompleted.value = 100;
         } else {
