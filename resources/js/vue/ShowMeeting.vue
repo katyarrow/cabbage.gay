@@ -84,8 +84,15 @@ const onAttendeeSubmit = (attendeeString) => {
     encryptedForm.signature = crypt.value.getSignatureFromFormObject(['data'], encryptedForm);
     axios.post(meeting.value.attendee_store_route, encryptedForm)
         .then(response => {
-            attendees.value = parseAttendees(response.data.data);
+            console.log(response.data);
+            
+            if(response.data.error) {
+                globalError.value = response.data.message || 'Something went wrong.';
+            } else {
+                attendees.value = parseAttendees(response.data.data);
+            }
             mode.value = 'show';
+            return;
         })
         .catch(error => {
             console.log(error);
