@@ -12,22 +12,25 @@ use Illuminate\Support\Facades\Notification;
 
 class AdminLoginController extends Controller
 {
-    public function index() {
-        return view("admin.login");
+    public function index()
+    {
+        return view('admin.login');
     }
 
-    public function store(AdminLoginRequest $request) {
+    public function store(AdminLoginRequest $request)
+    {
         $user = User::where('username', $request->username)->first();
-        if(!$user) {
+        if (! $user) {
             return redirect()->back()->withErrors(['username' => 'Invalid login']);
         }
-        if(!Hash::check($request->password, $user->password)) {
+        if (! Hash::check($request->password, $user->password)) {
             return redirect()->back()->withErrors(['username' => 'Invalid login']);
         }
         Notification::route('mail', env('ADMIN_NOTIFICATION_EMAIL'))
             ->notify(new AdminLoginNotification($user));
         session()->flush();
         Auth::login($user);
+
         return redirect()->route('admin.index');
     }
 }

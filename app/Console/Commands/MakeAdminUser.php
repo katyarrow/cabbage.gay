@@ -28,7 +28,7 @@ class MakeAdminUser extends Command
     {
         $username = $this->ask('Username: ');
         $password = $this->secret('Password: ');
-        $user = new User();
+        $user = new User;
         $user->username = $username;
         $user->password = bcrypt($password);
         $user->save();

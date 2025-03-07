@@ -4,7 +4,6 @@ namespace App\Notifications;
 
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -36,8 +35,8 @@ class AdminLoginNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->subject('New admin login on ' . config('app.name'))
-                    ->line('New admin login by: ' . $this->user->username . ' at ' . now()->toDateTimeString());
+            ->subject('New admin login on '.config('app.name'))
+            ->line('New admin login by: '.$this->user->username.' at '.now()->toDateTimeString());
     }
 
     /**
