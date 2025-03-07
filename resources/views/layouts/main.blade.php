@@ -12,7 +12,7 @@
     <body>
         <div id="app" class="min-h-screen flex flex-col">
             <x-header></x-header>
-            <main class="flex-1 px-3 md:px-10 py-3 md:py-7 w-5xl max-w-screen mx-auto">
+            <main class="flex-1 px-3 md:px-10 py-3 md:py-7 w-5xl max-w-screen mx-auto mb-40">
                 {{ $slot }}
             </main>
             <x-footer></x-footer>

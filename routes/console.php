@@ -9,4 +9,4 @@ Schedule::command(RemoveExpiredCaptchas::class)->everyMinute();
 // Backups
 Schedule::command('backup:clean')->daily()->at('11:00');
 Schedule::command('backup:monitor')->daily()->at('11:00');
-Schedule::command('backup:run')->everyFifteenMinutes();
+Schedule::command('backup:run --only-db')->everyFifteenMinutes();
