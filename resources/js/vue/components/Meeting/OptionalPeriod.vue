@@ -366,15 +366,15 @@ const submit = () => {
                                 <div v-if="displayType == 'proportion' || props.selectedAttendee" class="h-full w-full relative select-none" :style="{opacity: gridSquareDisplayInfo(day.date, time.time).opacity}">
                                     <div
                                         class="bg-yellow-300 inline-flex items-center justify-center absolute top-0 bottom-0 left-0"
-                                        :style="{width: (gridSquareDisplayInfo(day.date, time.time).ratio * 100) + '%'}"
-                                        :aria-label="'Maybe ' + (gridSquareDisplayInfo(day.date, time.time).ratio * 100) + '%'">
+                                        :style="{width: (gridSquareDisplayInfo(day.date, time.time).ratio * 100) + '%'}">
+                                        <span class="sr-only">{{ 'Maybe ' + (gridSquareDisplayInfo(day.date, time.time).ratio * 100) + '%' }}</span>
                                         <i class="far fa-circle-question text-xs" v-if="props.symbolMode && gridSquareDisplayInfo(day.date, time.time).ratio > 0"></i>
                                         <span v-else>&nbsp;</span>
                                     </div>
                                     <div
                                         class="bg-green-500 inline-flex items-center justify-center absolute top-0 bottom-0 right-0"
-                                        :style="{width: (gridSquareDisplayInfo(day.date, time.time).inverseRatio * 100) + '%'}"
-                                        :aria-label="'Maybe ' + (gridSquareDisplayInfo(day.date, time.time).inverseRatio * 100) + '%'">
+                                        :style="{width: (gridSquareDisplayInfo(day.date, time.time).inverseRatio * 100) + '%'}">
+                                        <span class="sr-only">{{ 'Yes ' + (gridSquareDisplayInfo(day.date, time.time).inverseRatio * 100) + '%' }}</span>
                                         <i class="far fa-circle-check text-xs" v-if="props.symbolMode && gridSquareDisplayInfo(day.date, time.time).inverseRatio > 0"></i>
                                         <span v-else>&nbsp;</span>
                                     </div>
