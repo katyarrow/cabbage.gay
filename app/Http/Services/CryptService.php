@@ -10,7 +10,7 @@ class CryptService
 
     public const MAX_MEETING_LENGTH = 10000;
 
-    public const MAX_MEETING_ATTENDEE_LENGTH = 20000;
+    public const MAX_MEETING_ATTENDEE_LENGTH = 200000;
 
     /**
      * Verifies that the given $signature is verified against the concatenated $requestData using the given $publicKey.
