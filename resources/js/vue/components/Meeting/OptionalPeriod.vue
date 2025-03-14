@@ -472,7 +472,7 @@ const submit = () => {
         <div v-if="props.mode == 'add'" class="flex items-center gap-5 mt-5">
             <div class="flex-1">
                 <VLabel for="name" class="sr-only">Your Name</VLabel>
-                <VInput v-model="availability.name" placeholder="Add a name" id="name" name="name" required maxlength="255"></VInput>
+                <VInput v-model="availability.name" placeholder="Add a name" id="name" name="name" required maxlength="128"></VInput>
             </div>
             <VButton type="submit" :disabled="!availability.name">Finish</VButton>
         </div>

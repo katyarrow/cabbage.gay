@@ -32,7 +32,7 @@
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-JRlCIBXQ.css",
+    "file": "assets/app-kQY4FdJI.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -65,7 +65,7 @@
     "src": "resources/fonts/advent-pro/advent-pro.thin.ttf"
   },
   "resources/js/app.js": {
-    "file": "assets/app-CaQFFlBN.js",
+    "file": "assets/app-DMsZrMGh.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

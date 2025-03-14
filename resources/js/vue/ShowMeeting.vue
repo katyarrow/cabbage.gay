@@ -9,9 +9,11 @@ import EntirePeriod from './components/Meeting/EntirePeriod.vue';
 import { VueFinalModal } from 'vue-final-modal';
 import OptionalPeriod from './components/Meeting/OptionalPeriod.vue';
 import VLabel from './components/VLabel.vue';
+import LZString from 'lz-string';
 
 const props = defineProps({
     meeting: Object,
+    siteTitle: String,
 });
 
 const globalError = ref(null);
@@ -44,7 +46,11 @@ const parseAttendees = (encryptedAttendeeArray) => {
     return encryptedAttendeeArray.map(a => {
         let data;
         try{
-            data = JSON.parse(crypt.value.decrypt(a.data));
+            data = crypt.value.decrypt(a.data);
+            if(data.startsWith('compressed:')) {
+                data = LZString.decompressFromEncodedURIComponent(data.replace('compressed:', ''));
+            }
+            data = JSON.parse(data);
         } catch (SyntaxError) {
             // in case the attendee data is not valid json.
             return false;
@@ -53,11 +59,15 @@ const parseAttendees = (encryptedAttendeeArray) => {
         data.destroy_route = a.destroy_route;
         data.destroy_challenge = a.destroy_challenge;
         data.showDelete = a.showDelete;
+        data.name = data.name.substring(0, 128);
         return data;
-    }).filter(a => a !== false);
+    })
+    .filter(a => a !== false)
+    .sort((a, b) => a.name.localeCompare(b.name, navigator.languages[0] || navigator.language, {numeric: true, ignorePunctuation: true}));
 }
 
 onMounted(async() => {
+    document.getElementsByTagName('title')[0].innerHTML = 'loading... ' + props.siteTitle;
     crypt.value = Crypt.generateFromUrl();
     await crypt.value.awaitReady();
     let meetingData = JSON.parse(crypt.value.decrypt(props.meeting.data));
@@ -68,24 +78,24 @@ onMounted(async() => {
     meeting.value.destroy_at = props.meeting.destroy_at;
     meeting.value.show_route = props.meeting.show_route;
     meeting.value.attendee_store_route = props.meeting.attendee_store_route;
+    meeting.value.name = meeting.value.name.substring(0, 255);
     attendees.value = parseAttendees(props.meeting.attendees)
     loaded.value = true;
 
     let meetingTitle = meeting.value.name.substring(0, 100);
     meetingTitle = meetingTitle.length < meeting.value.name.length ? meetingTitle + '...' : meetingTitle;
-    document.getElementsByTagName('title')[0].innerHTML = document.title.replace('LOADING', meetingTitle);
+    document.getElementsByTagName('title')[0].innerHTML = meetingTitle + ' - ' + props.siteTitle;
 });
 
 const onAttendeeSubmit = (attendeeString) => {
     posting.value = true;
+    let compressed = 'compressed:' + LZString.compressToEncodedURIComponent(attendeeString);
     let encryptedForm = {
-        data: crypt.value.encrypt(attendeeString),
+        data: crypt.value.encrypt(compressed),
     }
     encryptedForm.signature = crypt.value.getSignatureFromFormObject(['data'], encryptedForm);
     axios.post(meeting.value.attendee_store_route, encryptedForm)
         .then(response => {
-            console.log(response.data);
-            
             if(response.data.error) {
                 globalError.value = response.data.message || 'Something went wrong.';
             } else {
@@ -181,7 +191,7 @@ const copyLink = () => {
                     </div>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-7">
                 <div :class="[mode == 'show' ? 'col-span-4' : 'col-span-full']">
                     <EntirePeriod
                         v-if="meeting.entire_period"
@@ -209,7 +219,7 @@ const copyLink = () => {
                 </div>
                 <div :class="[meeting.entire_period ? '' : 'my-5 md:mt-10']" v-if="mode == 'show'">
                     <h2 class="text-lg font-semibold tracking-wider text-left text-nowrap">Responses ({{ attendees.length }})</h2>
-                    <ul class="list-disc list-inside flex flex-col gap-3">
+                    <ul class="flex flex-col gap-3">
                         <li v-for="attendee in attendees">
                             <span
                                 v-if="selectedDay"
@@ -223,15 +233,15 @@ const copyLink = () => {
                                 <i class="far fa-circle-check" aria-label="Yes" v-if="selectedDay.attendeesYes.find(a => a.identifier == attendee.identifier)"></i>
                                 <i class="far fa-circle-question" aria-label="Maybe" v-else-if="selectedDay.attendeesMaybe.find(a => a.identifier == attendee.identifier)"></i>
                                 <i class="far fa-circle-xmark" aria-label="No" v-else-if="selectedDay.attendeesNo.find(a => a.identifier == attendee.identifier)"></i>
-                                <span class="ml-2">{{ attendee.name }}</span>
+                                <span class="ml-2 break-all">{{ attendee.name }}</span>
                             </span>
-                            <span v-else>
+                            <span v-else class="inline-block">
                                 <button
                                     type="button"
-                                    class="hover:text-green-600 hover:font-medium cursor-pointer"
+                                    class="hover:text-green-600 hover:font-medium cursor-pointer break-all inline text-left"
                                     :class="[selectedAttendee === attendee ? 'text-green-500 font-medium' : '']"
                                     @click="selectedAttendee = selectedAttendee === attendee ? selectedAttendee = null : selectedAttendee = attendee">
-                                    {{ attendee.name }}
+                                    • <span class="sr-only">Select</span> {{ attendee.name }}
                                 </button>
                                 <button @click="attendee.showDelete = true" aria-label="Delete responder" class="cursor-pointer ml-2">
                                     <i class="fa fa-xmark text-red-600 text-sm"></i>
@@ -241,7 +251,7 @@ const copyLink = () => {
                                     content-class="bg-white p-5 rounded relative">
                                     <button class="absolute top-0 right-1 cursor-pointer" @click="attendee.showDelete = false" aria-label="Close Modal"><i class="fa fa-xmark"></i></button>
                                     <form @submit.prevent="deleteAttendee(attendee)">
-                                        Are you sure you want to delete this response for "{{ attendee.name }}"?
+                                        <span class="break-all">Are you sure you want to delete this response for "{{ attendee.name }}"?</span>
                                         <div class="flex items-center justify-between mt-5">
                                             <VButton type="submit" color="danger">Delete</VButton>
                                             <VButton type="button" color="secondary" @click="attendee.showDelete = false">Cancel</VButton>
