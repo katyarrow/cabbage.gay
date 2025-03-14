@@ -1,4 +1,7 @@
-<x-main-layout>
+<x-main-layout
+    title="Frequently Asked Questions"
+    description="Learn more about this website and the limits of end to end encryption."
+>
     <h1 class="text-3xl font-semibold tracking-wider text-center mb-5">Frequently Asked Questions</h1>
     <ul class="max-w-lg mx-auto">
         <li class="my-10">
