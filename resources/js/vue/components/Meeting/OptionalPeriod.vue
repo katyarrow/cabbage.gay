@@ -102,9 +102,16 @@ const generateDays = () => {
     while(currTime < endTime) {
         let userTime = currTime.clone().tz(props.userTimezone);
         let time = currTime.clone();
-        let hourDiff = time.hour() + moment.tz(userTime.format('YYYY-MM-DD HH:mm'), props.meeting.timezone)
-                                    .diff(moment.tz(time.format('YYYY-MM-DD HH:mm'), props.meeting.timezone), 'hours');
-        let tzTimeDiffInDays = hourDiff < 0 ? '-1' : (hourDiff > 23 ? '+1' : null);
+
+        let tzTimeDiffInDays = ((parseInt(userTime.format('YYYY')) * 365) + parseInt(userTime.format('DDD'))) - ((parseInt(time.format('YYYY')) * 365) + parseInt(time.format('DDD')));
+
+        if(tzTimeDiffInDays == 0) {
+            tzTimeDiffInDays = null
+        } else if (Math.abs(tzTimeDiffInDays) > 1) {
+            tzTimeDiffInDays = (tzTimeDiffInDays >= 0 ? '+' : '') + tzTimeDiffInDays +  ' days';
+        } else {
+            tzTimeDiffInDays = (tzTimeDiffInDays >= 0 ? '+' : '') + tzTimeDiffInDays +  ' day';
+        }
         times.value.push({
             time: time,
             userTime: userTime,
@@ -298,7 +305,7 @@ const submit = () => {
             <table class="w-full my-5 table-fixed touch-none" ondragstart="return false;" ondragend="return false;" :key="JSON.stringify(props.selectedAttendee)">
                 <thead>
                     <tr>
-                        <th scope="col" class="w-10"><span class="sr-only">Times</span></th>
+                        <th scope="col" class="w-11"><span class="sr-only">Times</span></th>
                         <th scope="col" v-for="day in paginatedDays.days">
                             <div class="flex flex-col items-center font-normal select-none">
                                 <span class="uppercase text-xs">{{ day.date.format('ddd') }}</span>
@@ -314,14 +321,14 @@ const submit = () => {
                                 <time v-if="timeIndex % 2 == 0">
                                     {{ time.userTime.format('h a') }}
                                     <span v-if="time.tzTimeDiffInDays != null" class="sr-only">
-                                        {{ time.tzTimeDiffInDays }} day
+                                        {{ time.tzTimeDiffInDays }}
                                     </span>
                                 </time>
                                 <time v-else>
                                     <span class="sr-only">{{ time.userTime.format('h:mm a') }}</span>
                                     <span v-if="time.tzTimeDiffInDays != null"
                                         class="inline-block text-xs bg-yellow-200 text-gray-700 rounded-full px-1">
-                                        {{ time.tzTimeDiffInDays }} day
+                                        {{ time.tzTimeDiffInDays }}
                                     </span>
                                 </time>
                             </span>
