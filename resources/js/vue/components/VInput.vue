@@ -26,7 +26,6 @@
         font-medium
         text-lg
         py-3
-        focus:px-3
         focus:outline-0
         focus:bg-green-50
         transition-all
@@ -34,7 +33,7 @@
         rounded-tr
         disabled:bg-gray-100
     "
-    :class="[error ? 'border-b-red-600' : '']"
+    :class="[error ? 'border-b-red-600' : '', $attrs.type == 'date' ? 'focus:pl-3' : 'focus:px-3']"
     :value="modelValue"
     @input="handleInput($event)">
     <VError v-model="error"></VError>
