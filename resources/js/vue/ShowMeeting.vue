@@ -264,5 +264,8 @@ const copyLink = () => {
                 </div>
             </div>
         </div>
+        <p class="text-center text-gray-700 font-medium mt-20">
+            This poll will self destruct on the {{ moment(meeting.destroy_at).format('do of MMMM YYYY') }}
+        </p>
     </div>
 </template>
