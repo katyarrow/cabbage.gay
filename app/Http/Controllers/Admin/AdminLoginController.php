@@ -26,7 +26,7 @@ class AdminLoginController extends Controller
         if (! Hash::check($request->password, $user->password)) {
             return redirect()->back()->withErrors(['username' => 'Invalid login']);
         }
-        Notification::route('mail', env('ADMIN_NOTIFICATION_EMAIL'))
+        Notification::route('mail', config('app.admin_notification_email'))
             ->notify(new AdminLoginNotification($user));
         session()->flush();
         Auth::login($user);
