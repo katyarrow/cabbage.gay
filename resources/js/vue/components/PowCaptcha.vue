@@ -69,7 +69,7 @@ defineExpose({
 </script>
 
 <template>
-    <div class="p-2 rounded shadow border border-green-600 font-medium w-3xs"
+    <div class="pow-captcha p-2 rounded shadow border border-green-600 font-medium w-3xs"
         v-if="started" aria-live="true" role="alert">
         <div v-if="error" class="flex items-center text-red-700 text-lg">
             <i class="fa fa-xmark text-2xl mr-3"></i>

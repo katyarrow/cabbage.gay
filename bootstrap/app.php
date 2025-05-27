@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->report(function(Exception $exception) {
+        $exceptions->report(function (Exception $exception) {
             Notification::route('mail', config('app.admin_notification_email'))
                 ->notify(new AdminErrorNotification($exception));
         });
