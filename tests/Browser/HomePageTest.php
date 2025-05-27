@@ -73,7 +73,6 @@ class HomePageTest extends DuskTestCase
 
             $url = $browser->driver->getCurrentURL();
             $meetingId = explode('#', explode(config('app.url').'/meeting/', $url)[1])[0];
-            dump($meetingId);
             $browser->assertRouteIs('meeting.show', ['meeting' => $meetingId]);
             $this->assertDatabaseHas('meetings', [
                 'identifier' => $meetingId,
