@@ -12,6 +12,8 @@ class HomePageTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/');
 
+            $browser->assertHasHeaderAndFooter();
+
             // General check for base inputs.
             $browser->assertTitle('Home - cabbage.gay');
             $browser->assertSee('Create a Meeting');
@@ -38,8 +40,8 @@ class HomePageTest extends DuskTestCase
             $browser->assertInputMissing(now()->addDays(2)->format('Y-m-d'));
 
             $browser->check('specific_dates');
-            $this->typeDateField($browser, '#start_date', now()->addDays(1));
-            $this->typeDateField($browser, '#end_date', now()->addDays(3));
+            $browser->typeDateField('#start_date', now()->addDays(1));
+            $browser->typeDateField('#end_date', now()->addDays(3));
 
             $browser->assertSee(now()->addDays(1)->format('D jS M'));
             $browser->assertSee(now()->addDays(2)->format('D jS M'));
@@ -47,8 +49,9 @@ class HomePageTest extends DuskTestCase
             $browser->assertInputPresent(now()->addDays(2)->format('Y-m-d'));
 
             // Checking that destroy date changes.
-            $this->typeDateField($browser, '#start_date', now()->addDays(5));
-            $browser->assertInputValue('destroy_at', now()->addDays(6)->format('Y-m-d'));
+            $browser->typeDateField('#end_date', now()->addDays(5));
+            $browser->pause(100);
+            $browser->assertInputValue('destroy_at', now()->addDays(5)->format('Y-m-d'));
         });
     }
 
@@ -58,11 +61,11 @@ class HomePageTest extends DuskTestCase
             $browser->visit('/');
 
             $browser->type('name', 'test123');
-            $this->typeDateField($browser, '#start_date', now()->addDays(1));
-            $this->typeDateField($browser, '#end_date', now()->addDays(7));
+            $browser->typeDateField('#start_date', now()->addDays(1));
+            $browser->typeDateField('#end_date', now()->addDays(7));
             $browser->select('start_time', '06:00');
             $browser->select('end_time', '12:00');
-            $this->typeDateField($browser, '#destroy_at', now()->addDays(8));
+            $browser->typeDateField('#destroy_at', now()->addDays(8));
             $browser->select('timezone', 'Europe/London');
 
             $browser->press('button[type="submit"]');

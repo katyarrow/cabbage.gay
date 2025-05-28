@@ -39,6 +39,7 @@ switch(props.size) {
     "
     :class="[error ? 'border-b-red-600' : '', sizeClasses]"
     :value="modelValue"
-    @input="handleInput($event)"><slot></slot></select>
+    @input="handleInput($event)"
+    @change="handleInput($event)"><slot></slot></select>
     <VError v-model="error"></VError>
 </template>

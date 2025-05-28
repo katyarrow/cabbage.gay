@@ -11,6 +11,8 @@ use Illuminate\Support\Collection;
 use Laravel\Dusk\Browser;
 use Laravel\Dusk\TestCase as BaseTestCase;
 use PHPUnit\Framework\Attributes\BeforeClass;
+use Tests\Browser\Components\Footer;
+use Tests\Browser\Components\Header;
 
 abstract class DuskTestCase extends BaseTestCase
 {
@@ -26,6 +28,58 @@ abstract class DuskTestCase extends BaseTestCase
             $this->script('window.duskPageIsStale = {}');
 
             return $this->waitUntil("return typeof window.duskPageIsStale === 'undefined';");
+        });
+
+        Browser::macro('assertHasHeader', function (): Browser {
+            return $this->within(new Header, function(Browser $browser) {});
+        });
+
+        Browser::macro('assertHasFooter', function (): Browser {
+            return $this->within(new Footer, function(Browser $browser) {});
+        });
+
+        Browser::macro('assertHasHeaderAndFooter', function (): Browser {
+            return $this->assertHasFooter()->assertHasHeader();
+        });
+
+        Browser::macro('typeDateField', function (string $selector, Carbon $date): Browser {
+            $dateString = $date->format('Y-m-d');
+            $this->script([
+                "document.querySelector('$selector').value = '$dateString'",
+                "document.querySelector('$selector').dispatchEvent(new Event('change'))",
+            ]);
+            return $this;
+        });
+
+        Browser::macro('createMeeting', function (array $data=[]): Browser {
+            $this->visit('/');
+            $this->type('name', $data['name'] ?? str()->random());
+            if(array_key_exists('entire_period', $data)) {
+                $this->check('entire_period');
+            }
+            if(array_key_exists('start_date', $data)) {
+                $this->typeDateField('#start_date', $data['start_date']);
+            }
+            if(array_key_exists('end_date', $data)) {
+                $this->typeDateField('#end_date', $data['end_date']);
+            }
+            if(array_key_exists('start_time', $data)) {
+                $this->select('start_time', $data['start_time']);
+            }
+            if(array_key_exists('end_time', $data)) {
+                $this->select('end_time', $data['end_time']);
+            }
+            if(array_key_exists('destroy_at', $data)) {
+                $this->typeDateField('#destroy_at', $data['destroy_at']);
+            }
+            if(array_key_exists('timezone', $data)) {
+                $this->select('timezone', $data['timezone']);
+            }
+
+            $this->press('button[type="submit"]');
+
+            $this->waitForReload();
+            return $this;
         });
 
         if (! static::runningInSail()) {
@@ -56,13 +110,5 @@ abstract class DuskTestCase extends BaseTestCase
                 ChromeOptions::CAPABILITY, $options
             )
         );
-    }
-
-    public function typeDateField($browser, $selector, Carbon $date)
-    {
-        $dateString = $date->format('Y-m-d');
-        $browser->script([
-            "document.querySelector('$selector').value = '$dateString'",
-        ]);
     }
 }

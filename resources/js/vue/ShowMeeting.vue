@@ -163,8 +163,8 @@ const copyLink = () => {
                     </div>
                 </div>
                 <div class="flex flex-col justify-start items-end gap-2">
-                    <VButton size="sm" v-if="mode == 'show'" @click="mode = 'add'">Add&nbsp;Availability</VButton>
-                    <VButton size="sm" v-if="mode == 'add'" color="danger" @click="mode = 'show'">Cancel</VButton>
+                    <VButton size="sm" v-if="mode == 'show'" @click="mode = 'add'" dusk="add-availability-btn">Add&nbsp;Availability</VButton>
+                    <VButton size="sm" v-if="mode == 'add'" color="danger" @click="mode = 'show'" dusk="cancel-adding-availability-btn">Cancel</VButton>
                     <VLabel class="select-none hidden md:block" v-if="!meeting.entire_period">
                         Symbol Mode
                         <VCheckbox v-model="symbolMode"></VCheckbox>
@@ -177,7 +177,7 @@ const copyLink = () => {
                             <VCheckbox v-model="showDifferentTimezoneInfo"></VCheckbox>
                         </VLabel>
                     </div>
-                    <VButton size="xs" @click="copyLink" class="block md:hidden">
+                    <VButton size="xs" @click="copyLink" class="block md:hidden" dusk="share-btn">
                         <span v-if="!shared">Share <i class="fas fa-share"></i></span>
                         <span v-else>Copied <i class="fas fa-check"></i></span>
                     </VButton>
