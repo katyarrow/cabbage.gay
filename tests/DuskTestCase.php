@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\BeforeClass;
 
 abstract class DuskTestCase extends BaseTestCase
 {
-    // use DatabaseTruncation;
+    use DatabaseTruncation;
 
     /**
      * Prepare for Dusk test execution.
