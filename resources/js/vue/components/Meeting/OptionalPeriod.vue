@@ -352,8 +352,14 @@ const submit = () => {
                                 :data-timeindex="timeIndex"
                                 :class="[
                                     {'yes': 'bg-green-400', 'maybe': 'bg-yellow-300', 'no': ''}[getAvailability(day.date, time.time)]
-                                ]">
-                                <div :class="[symbolMode ? '' : 'sr-only']" class="text-center text-gray-600 text-xs">
+                                ]"
+                                :dusk="'availability_selector_' + addDateAndTime(day.date, time.time).format('YYYY-MM-DD-HH-mm')"
+                            >
+                                <div
+                                    :class="[symbolMode ? '' : 'sr-only']"
+                                    class="text-center text-gray-600 text-xs"
+                                    :dusk="'availability_icon_' + addDateAndTime(day.date, time.time).format('YYYY-MM-DD-HH-mm')"
+                                >
                                     <i class="far fa-circle-check" v-if="getAvailability(day.date, time.time) == 'yes'" aria-label="Yes"></i>
                                     <i class="far fa-circle-question" v-else-if="getAvailability(day.date, time.time) == 'maybe'" aria-label="Maybe"></i>
                                     <span v-else class="sr-only">No</span>
@@ -363,7 +369,8 @@ const submit = () => {
                                     @keydown.space="startDrag(dateIndex, timeIndex, true)"
                                     @pointerdown="startDrag(dateIndex, timeIndex)"
                                     @mouseenter="hoverEnter(dateIndex, timeIndex)"
-                                    @pointermove="pointerMove">
+                                    @pointermove="pointerMove"
+                                    :dusk="'availability_btn_' + addDateAndTime(day.date, time.time).format('YYYY-MM-DD-HH-mm')">
                                     <span class="sr-only" v-if="getAvailability(day.date, time.time) == 'yes'">Change to maybe</span>
                                     <span class="sr-only" v-else="getAvailability(day.date, time.time) == 'maybe'">Change to no</span>
                                     <span class="sr-only" v-else>Change to yes</span>
@@ -468,11 +475,11 @@ const submit = () => {
             </div>
         </div>
         <div class="flex gap-5 justify-center items-center" v-if="mode == 'add' && paginatedDays.totalPages > 1">
-            <VButton type="button" size="sm" :disabled="paginatedDays.isFirstPage" @click="page--" class="flex-1 md:flex-auto">
+            <VButton dusk="adding-prev-page-btn" type="button" size="sm" :disabled="paginatedDays.isFirstPage" @click="page--" class="flex-1 md:flex-auto">
                 <i class="fa fa-chevron-left"></i> Previous <span class="sr-only">Page</span>
             </VButton>
             <p class="text-gray-500">Page {{ paginatedDays.currentPage + 1 }} / {{ paginatedDays.lastPage }}</p>
-            <VButton type="button" size="sm" :disabled="paginatedDays.isLastPage" @click="page++" class="flex-1 md:flex-auto">
+            <VButton dusk="adding-next-page-btn" type="button" size="sm" :disabled="paginatedDays.isLastPage" @click="page++" class="flex-1 md:flex-auto">
                 Next <span class="sr-only">Page</span> <i class="fa fa-chevron-right"></i>
             </VButton>
         </div>
@@ -481,7 +488,7 @@ const submit = () => {
                 <VLabel for="name" class="sr-only">Your Name</VLabel>
                 <VInput v-model="availability.name" placeholder="Add a name" id="name" name="name" required maxlength="128"></VInput>
             </div>
-            <VButton type="submit" :disabled="!availability.name">Finish</VButton>
+            <VButton type="submit" :disabled="!availability.name" dusk="finish-button">Finish</VButton>
         </div>
     </component>
 </template>
