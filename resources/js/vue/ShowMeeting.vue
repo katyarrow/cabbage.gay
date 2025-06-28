@@ -163,8 +163,8 @@ const copyLink = () => {
                     </div>
                 </div>
                 <div class="flex flex-col justify-start items-end gap-2">
-                    <VButton size="sm" v-if="mode == 'show'" @click="mode = 'add'">Add&nbsp;Availability</VButton>
-                    <VButton size="sm" v-if="mode == 'add'" color="danger" @click="mode = 'show'">Cancel</VButton>
+                    <VButton size="sm" v-if="mode == 'show'" @click="mode = 'add'" dusk="add-availability-btn">Add&nbsp;Availability</VButton>
+                    <VButton size="sm" v-if="mode == 'add'" color="danger" @click="mode = 'show'" dusk="cancel-adding-availability-btn">Cancel</VButton>
                     <VLabel class="select-none hidden md:block" v-if="!meeting.entire_period">
                         Symbol Mode
                         <VCheckbox v-model="symbolMode"></VCheckbox>
@@ -177,7 +177,7 @@ const copyLink = () => {
                             <VCheckbox v-model="showDifferentTimezoneInfo"></VCheckbox>
                         </VLabel>
                     </div>
-                    <VButton size="xs" @click="copyLink" class="block md:hidden">
+                    <VButton size="xs" @click="copyLink" class="block md:hidden" dusk="share-btn">
                         <span v-if="!shared">Share <i class="fas fa-share"></i></span>
                         <span v-else>Copied <i class="fas fa-check"></i></span>
                     </VButton>
@@ -243,7 +243,8 @@ const copyLink = () => {
                                     @click="selectedAttendee = selectedAttendee === attendee ? selectedAttendee = null : selectedAttendee = attendee">
                                     • <span class="sr-only">Select</span> {{ attendee.name }}
                                 </button>
-                                <button @click="attendee.showDelete = true" aria-label="Delete responder" class="cursor-pointer ml-2">
+                                <button @click="attendee.showDelete = true" aria-label="Delete responder" class="cursor-pointer ml-2"
+                                    :dusk="'delete_responder_' + attendee.name">
                                     <i class="fa fa-xmark text-red-600 text-sm"></i>
                                 </button>
                                 <VueFinalModal
@@ -253,7 +254,7 @@ const copyLink = () => {
                                     <form @submit.prevent="deleteAttendee(attendee)">
                                         <span class="break-all">Are you sure you want to delete this response for "{{ attendee.name }}"?</span>
                                         <div class="flex items-center justify-between mt-5">
-                                            <VButton type="submit" color="danger">Delete</VButton>
+                                            <VButton dusk="delete-user-btn" type="submit" color="danger">Delete</VButton>
                                             <VButton type="button" color="secondary" @click="attendee.showDelete = false">Cancel</VButton>
                                         </div>
                                     </form>

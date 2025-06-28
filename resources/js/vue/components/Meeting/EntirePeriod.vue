@@ -134,21 +134,27 @@ const toggleDay = (day) => {
                         <div class="bg-green-600 rounded px-2 text-white cursor-pointer">
                             <span class="sr-only">Yes</span>
                             <span class="font-bold rounded tracking-widest whitespace-nowrap">
-                                <span class="">{{ valueCountOnDate(day.date.format(dateFormat), 'yes') }}</span>
+                                <span :dusk="'availability_' + day.date.format('YYYYMMDD') + '_yes'">
+                                    {{ valueCountOnDate(day.date.format(dateFormat), 'yes') }}
+                                </span>
                                 <i class="far fa-circle-check inline-block ml-px text-xs" aria-hidden="true"></i>
                             </span>
                         </div>
                         <div class="bg-yellow-400 rounded px-2 cursor-pointer">
                             <span class="sr-only">Maybe</span>
                             <span class="font-bold rounded tracking-widest whitespace-nowrap">
-                                <span class="">{{ valueCountOnDate(day.date.format(dateFormat), 'maybe') }}</span>
+                                <span :dusk="'availability_' + day.date.format('YYYYMMDD') + '_maybe'">
+                                    {{ valueCountOnDate(day.date.format(dateFormat), 'maybe') }}
+                                </span>
                                 <i class="far fa-circle-question inline-block ml-px text-xs" aria-hidden="true"></i>
                             </span>
                         </div>
                         <div class="bg-gray-300 rounded px-2 cursor-pointer">
                             <span class="sr-only">No</span>
                             <span class="font-bold rounded tracking-widest whitespace-nowrap">
-                                <span class="">{{ valueCountOnDate(day.date.format(dateFormat), 'no') }}</span>
+                                <span :dusk="'availability_' + day.date.format('YYYYMMDD') + '_no'">
+                                    {{ valueCountOnDate(day.date.format(dateFormat), 'no') }}
+                                </span>
                                 <i class="far fa-circle-xmark inline-block ml-px text-xs" aria-hidden="true"></i>
                             </span>
                         </div>
@@ -197,7 +203,7 @@ const toggleDay = (day) => {
                 <VLabel for="name" class="sr-only">Your Name</VLabel>
                 <VInput v-model="availability.name" placeholder="Add a name" id="name" name="name" required maxlength="128"></VInput>
             </div>
-            <VButton type="submit" :disabled="!availability.name">Finish</VButton>
+            <VButton type="submit" :disabled="!availability.name" dusk="finish-button">Finish</VButton>
         </div>
     </component>
 </template>

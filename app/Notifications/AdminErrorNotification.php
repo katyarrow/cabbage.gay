@@ -2,10 +2,7 @@
 
 namespace App\Notifications;
 
-use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -36,7 +33,7 @@ class AdminErrorNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $message = (new MailMessage)->line('There has been an error on ' . config('app.name') . '.');
+        $message = (new MailMessage)->line('There has been an error on '.config('app.name').'.');
         $message->line($this->exception->getMessage());
 
         return $message;

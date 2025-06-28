@@ -10,7 +10,7 @@
     const emit = defineEmits(['update:modelValue'])
 
     const handleInput = ($event) => {
-       emit('update:modelValue', $event.target.value)
+        emit('update:modelValue', $event.target.value)
     }
 
     const error = defineModel('error');
@@ -35,6 +35,7 @@
     "
     :class="[error ? 'border-b-red-600' : '', $attrs.type == 'date' ? 'focus:pl-3' : 'focus:px-3']"
     :value="modelValue"
-    @input="handleInput($event)">
+    @input="handleInput($event)"
+    @change="handleInput($event)">
     <VError v-model="error"></VError>
 </template>

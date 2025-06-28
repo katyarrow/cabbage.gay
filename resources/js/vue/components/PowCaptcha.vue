@@ -69,7 +69,7 @@ defineExpose({
 </script>
 
 <template>
-    <div class="p-2 rounded shadow border border-green-600 font-medium w-3xs"
+    <div class="pow-captcha p-2 rounded shadow border border-green-600 font-medium w-3xs"
         v-if="started" aria-live="true" role="alert">
         <div v-if="error" class="flex items-center text-red-700 text-lg">
             <i class="fa fa-xmark text-2xl mr-3"></i>
@@ -81,7 +81,7 @@ defineExpose({
                 <i class="fa fa-spinner fa-spin text-gray-500" v-else></i>
             </span>
             <span class="flex items-center justify-center col-span-2 text-2xl">
-                <span v-if="completed">Completed!</span>
+                <span v-if="completed" dusk="captcha-completed-text">Completed!</span>
                 <span v-else>Verifying</span>
             </span>
             <span class="col-span-full relative rounded overflow-hidden h-3 bg-gray-50 w-full">
@@ -93,7 +93,7 @@ defineExpose({
     </div>
     <div class="p-2 rounded shadow border border-green-600 font-medium w-3xs flex items-center justify-between" v-if="!started && solveCaptchaButton">
         Solve Captcha
-        <button type="button" class="border rounded-lg h-6 w-6" aria-label="Solve Captcha" @click="completeCaptcha"></button>
+        <button type="button" class="border rounded-lg h-6 w-6" aria-label="Solve Captcha" @click="completeCaptcha" dusk="solve-captcha-btn"></button>
     </div>
     <input v-if="completed && props.usedInForm" type="hidden" name="captcha" :value="solvedToken">
 </template>

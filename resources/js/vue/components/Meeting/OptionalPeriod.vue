@@ -298,7 +298,7 @@ const submit = () => {
     <component :is="props.mode == 'show' ? 'div' : 'form'" @submit.prevent="submit">
         <p class="text-center text-gray-800">{{ currentPaginatedMonths }}</p>
         <div class="relative flex items-center">
-            <button type="button" class="absolute -left-6 cursor-pointer" v-if="!paginatedDays.isFirstPage" @click="page--">
+            <button dusk="prev-page-btn" type="button" class="absolute -left-6 cursor-pointer" v-if="!paginatedDays.isFirstPage" @click="page--">
                 <span class="sr-only">Previous page</span>
                 <i class="fa fa-chevron-left text-3xl text-gray-300"></i>
             </button>
@@ -449,7 +449,7 @@ const submit = () => {
                     </tr>
                 </tbody>
             </table>
-            <button type="button" class="absolute -right-6 cursor-pointer" v-if="!paginatedDays.isLastPage" @click="page++">
+            <button dusk="next-page-btn" type="button" class="absolute -right-6 cursor-pointer" v-if="!paginatedDays.isLastPage" @click="page++">
                 <span class="sr-only">Next page</span>
                 <i class="fa fa-chevron-right text-3xl text-gray-300"></i>
             </button>

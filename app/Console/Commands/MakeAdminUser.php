@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use Hash;
 use Illuminate\Console\Command;
 
 class MakeAdminUser extends Command
@@ -30,7 +31,7 @@ class MakeAdminUser extends Command
         $password = $this->secret('Password: ');
         $user = new User;
         $user->username = $username;
-        $user->password = bcrypt($password);
+        $user->password = Hash::make($password);
         $user->save();
     }
 }
