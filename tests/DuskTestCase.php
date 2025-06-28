@@ -54,7 +54,7 @@ abstract class DuskTestCase extends BaseTestCase
         Browser::macro('createMeeting', function (array $data=[]): Browser {
             $this->visit('/');
             $this->type('name', $data['name'] ?? str()->random());
-            if(array_key_exists('entire_period', $data)) {
+            if(array_key_exists('entire_period', $data) && $data['entire_period']) {
                 $this->check('entire_period');
             }
             if(array_key_exists('start_date', $data)) {
