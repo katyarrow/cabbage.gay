@@ -243,7 +243,8 @@ const copyLink = () => {
                                     @click="selectedAttendee = selectedAttendee === attendee ? selectedAttendee = null : selectedAttendee = attendee">
                                     • <span class="sr-only">Select</span> {{ attendee.name }}
                                 </button>
-                                <button @click="attendee.showDelete = true" aria-label="Delete responder" class="cursor-pointer ml-2">
+                                <button @click="attendee.showDelete = true" aria-label="Delete responder" class="cursor-pointer ml-2"
+                                    :dusk="'delete_responder_' + attendee.name">
                                     <i class="fa fa-xmark text-red-600 text-sm"></i>
                                 </button>
                                 <VueFinalModal
@@ -253,7 +254,7 @@ const copyLink = () => {
                                     <form @submit.prevent="deleteAttendee(attendee)">
                                         <span class="break-all">Are you sure you want to delete this response for "{{ attendee.name }}"?</span>
                                         <div class="flex items-center justify-between mt-5">
-                                            <VButton type="submit" color="danger">Delete</VButton>
+                                            <VButton dusk="delete-user-btn" type="submit" color="danger">Delete</VButton>
                                             <VButton type="button" color="secondary" @click="attendee.showDelete = false">Cancel</VButton>
                                         </div>
                                     </form>
