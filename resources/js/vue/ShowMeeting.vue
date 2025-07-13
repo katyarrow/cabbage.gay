@@ -10,6 +10,7 @@ import { VueFinalModal } from 'vue-final-modal';
 import OptionalPeriod from './components/Meeting/OptionalPeriod.vue';
 import VLabel from './components/VLabel.vue';
 import LZString from 'lz-string';
+import constants from '#root/constants';
 
 const props = defineProps({
     meeting: Object,
@@ -20,7 +21,7 @@ const globalError = ref(null);
 const loaded = ref(false);
 const posting = ref(false);
 const crypt = ref(null);
-const mode = ref('show');
+const mode = ref(constants.MEETING_MODE_SHOW);
 const shared = ref(false);
 const selectedAttendee = ref(null);
 const selectedDay = ref(null);
@@ -101,7 +102,7 @@ const onAttendeeSubmit = (attendeeString) => {
             } else {
                 attendees.value = parseAttendees(response.data.data);
             }
-            mode.value = 'show';
+            mode.value = constants.MEETING_MODE_SHOW;
             return;
         })
         .catch(error => {
@@ -134,6 +135,18 @@ const copyLink = () => {
     setTimeout(() => shared.value = false, 3000);
 }
 
+const setModeAdd = () => {
+    setMode(constants.MEETING_MODE_ADD);
+}
+
+const setModeShow = () => {
+    setMode(constants.MEETING_MODE_SHOW);
+}
+
+const setMode = modeToSet => {
+    mode.value = modeToSet;
+}
+
 </script>
 
 <template>
@@ -163,8 +176,8 @@ const copyLink = () => {
                     </div>
                 </div>
                 <div class="flex flex-col justify-start items-end gap-2">
-                    <VButton size="sm" v-if="mode == 'show'" @click="mode = 'add'" dusk="add-availability-btn">Add&nbsp;Availability</VButton>
-                    <VButton size="sm" v-if="mode == 'add'" color="danger" @click="mode = 'show'" dusk="cancel-adding-availability-btn">Cancel</VButton>
+                    <VButton size="sm" v-if="mode == constants.MEETING_MODE_SHOW" @click="setModeAdd" dusk="add-availability-btn">Add&nbsp;Availability</VButton>
+                    <VButton size="sm" v-if="mode == constants.MEETING_MODE_ADD" color="danger" @click="setModeShow" dusk="cancel-adding-availability-btn">Cancel</VButton>
                     <VLabel class="select-none hidden md:block" v-if="!meeting.entire_period">
                         Symbol Mode
                         <VCheckbox v-model="symbolMode"></VCheckbox>
@@ -192,7 +205,7 @@ const copyLink = () => {
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-5 gap-7">
-                <div :class="[mode == 'show' ? 'col-span-4' : 'col-span-full']">
+                <div :class="[mode == constants.MEETING_MODE_SHOW ? 'col-span-4' : 'col-span-full']">
                     <EntirePeriod
                         v-if="meeting.entire_period"
                         :meeting="meeting"
@@ -217,7 +230,7 @@ const copyLink = () => {
                         @submit="onAttendeeSubmit"
                     ></OptionalPeriod>
                 </div>
-                <div :class="[meeting.entire_period ? '' : 'my-5 md:mt-10']" v-if="mode == 'show'">
+                <div :class="[meeting.entire_period ? '' : 'my-5 md:mt-10']" v-if="mode == constants.MEETING_MODE_SHOW">
                     <h2 class="text-lg font-semibold tracking-wider text-left text-nowrap">Responses ({{ attendees.length }})</h2>
                     <ul class="flex flex-col gap-3">
                         <li v-for="attendee in attendees">

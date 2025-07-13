@@ -7,6 +7,7 @@ import VAlert from '../VAlert.vue';
 import EntirePeriodDateDisplay from './EntirePeriodDateDisplay.vue';
 import moment from 'moment';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import constants from '#root/constants';
 
 const props = defineProps({
     meeting: Object,
@@ -63,7 +64,7 @@ const generateDays = () => {
 const generateFreshAvailability = () => {
     let newAvailability = {};
     days.value.forEach(day => {
-        newAvailability[day.date.format(dateFormat)] = 'no';
+        newAvailability[day.date.format(dateFormat)] = constants.AVAILABILITY_NO;
     });
     availability.value.dates = newAvailability;
     availability.value.name = null;
@@ -72,7 +73,7 @@ const generateFreshAvailability = () => {
 generateDays();
 
 watch(() => props.mode, () => {
-    if(props.mode == 'add') {
+    if(props.mode == constants.MEETING_MODE_ADD) {
         generateFreshAvailability();
     }
 })
@@ -106,9 +107,9 @@ const toggleDay = (day) => {
     nextTick(() => {
         selectedDay.value = {
             date: day.date,
-            attendeesYes: attendeesOnDayWithValue(day.date.format(dateFormat), 'yes'),
-            attendeesMaybe: attendeesOnDayWithValue(day.date.format(dateFormat), 'maybe'),
-            attendeesNo: attendeesOnDayWithValue(day.date.format(dateFormat), 'no'),
+            attendeesYes: attendeesOnDayWithValue(day.date.format(dateFormat), constants.AVAILABILITY_YES),
+            attendeesMaybe: attendeesOnDayWithValue(day.date.format(dateFormat), constants.AVAILABILITY_MAYBE),
+            attendeesNo: attendeesOnDayWithValue(day.date.format(dateFormat), constants.AVAILABILITY_NO),
         };
     })
 }
@@ -117,7 +118,7 @@ const toggleDay = (day) => {
 
 <template>
     <VAlert v-model="generalError" level="warning"></VAlert>
-    <component :is="props.mode == 'show' ? 'div' : 'form'" @submit.prevent="submit">
+    <component :is="props.mode == constants.MEETING_MODE_SHOW ? 'div' : 'form'" @submit.prevent="submit">
         <ul class="grid grid-cols-1 md:grid-cols-4 gap-5">
             <li
                 v-for="day in days" :key="day.date.format(dateFormat)"
@@ -125,7 +126,7 @@ const toggleDay = (day) => {
                 <div
                     class="px-3 py-4 border rounded relative cursor-pointer hover:bg-gray-50 focus:bg-gray-50 transition-colors"
                     :class="[selectedDayIsSame(day) ? 'border-green-600' : 'border-gray-200']"
-                    v-if="mode == 'show'">
+                    v-if="mode == constants.MEETING_MODE_SHOW">
                     <EntirePeriodDateDisplay
                         :day="day"
                         :show-different-timezone-info="props.showDifferentTimezoneInfo"
@@ -135,7 +136,7 @@ const toggleDay = (day) => {
                             <span class="sr-only">Yes</span>
                             <span class="font-bold rounded tracking-widest whitespace-nowrap">
                                 <span :dusk="'availability_' + day.date.format('YYYYMMDD') + '_yes'">
-                                    {{ valueCountOnDate(day.date.format(dateFormat), 'yes') }}
+                                    {{ valueCountOnDate(day.date.format(dateFormat), constants.AVAILABILITY_YES) }}
                                 </span>
                                 <i class="far fa-circle-check inline-block ml-px text-xs" aria-hidden="true"></i>
                             </span>
@@ -144,7 +145,7 @@ const toggleDay = (day) => {
                             <span class="sr-only">Maybe</span>
                             <span class="font-bold rounded tracking-widest whitespace-nowrap">
                                 <span :dusk="'availability_' + day.date.format('YYYYMMDD') + '_maybe'">
-                                    {{ valueCountOnDate(day.date.format(dateFormat), 'maybe') }}
+                                    {{ valueCountOnDate(day.date.format(dateFormat), constants.AVAILABILITY_MAYBE) }}
                                 </span>
                                 <i class="far fa-circle-question inline-block ml-px text-xs" aria-hidden="true"></i>
                             </span>
@@ -153,7 +154,7 @@ const toggleDay = (day) => {
                             <span class="sr-only">No</span>
                             <span class="font-bold rounded tracking-widest whitespace-nowrap">
                                 <span :dusk="'availability_' + day.date.format('YYYYMMDD') + '_no'">
-                                    {{ valueCountOnDate(day.date.format(dateFormat), 'no') }}
+                                    {{ valueCountOnDate(day.date.format(dateFormat), constants.AVAILABILITY_NO) }}
                                 </span>
                                 <i class="far fa-circle-xmark inline-block ml-px text-xs" aria-hidden="true"></i>
                             </span>
@@ -164,7 +165,7 @@ const toggleDay = (day) => {
                         <span class="sr-only" v-else>Unselect responses for this day</span>
                     </button>
                 </div>
-                <div v-else-if="mode == 'add'" class="px-3 py-4 border border-gray-200 rounded relative">
+                <div v-else-if="mode == constants.MEETING_MODE_ADD" class="px-3 py-4 border border-gray-200 rounded relative">
                     <EntirePeriodDateDisplay
                         :day="day"
                         :show-different-timezone-info="props.showDifferentTimezoneInfo"
@@ -198,7 +199,7 @@ const toggleDay = (day) => {
                 </div>
             </li>
         </ul>
-        <div v-if="props.mode == 'add'" class="flex items-center gap-5 mt-5">
+        <div v-if="props.mode == constants.MEETING_MODE_ADD" class="flex items-center gap-5 mt-5">
             <div class="flex-1">
                 <VLabel for="name" class="sr-only">Your Name</VLabel>
                 <VInput v-model="availability.name" placeholder="Add a name" id="name" name="name" required maxlength="128"></VInput>

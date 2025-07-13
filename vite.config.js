@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import laravel from 'laravel-vite-plugin'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
+import { resolve } from 'path';
 
 export default defineConfig({
     plugins: [
@@ -15,6 +16,7 @@ export default defineConfig({
     resolve: {
         alias: {
             vue: 'vue/dist/vue.esm-bundler.js',
+            '#root': resolve(__dirname) + '/resources/js',
         },
     },
     server: {
@@ -22,4 +24,10 @@ export default defineConfig({
             usePolling: true
         },
     },
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "root/*": ["*"]
+        }
+    }
 })

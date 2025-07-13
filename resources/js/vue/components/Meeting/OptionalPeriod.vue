@@ -7,6 +7,7 @@ import VButton from '../VButton.vue';
 import VAlert from '../VAlert.vue';
 import moment from 'moment';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import constants from '#root/constants';
 
 const props = defineProps({
     meeting: Object,
@@ -187,12 +188,12 @@ const gridSquareDisplayInfo = (date, time) => {
     }
     let attendees = props.selectedAttendee ? props.attendees.filter(a => a == props.selectedAttendee) : props.attendees;
     let values = attendees.map(a => a.dates[datetime]).filter(v => !!v);
-    let valuesPositive = values.filter(v => v == 'yes' || v == 'maybe');
-    let valuesYes = values.filter(v => v == 'yes');
-    let attendeesYes = attendees.filter(a => a.dates[datetime] == 'yes');
-    let valuesMaybe = values.filter(v => v == 'maybe');
-    let attendeesMaybe = attendees.filter(a => a.dates[datetime] == 'maybe');
-    let attendeesNo = attendees.filter(a => !(a.dates[datetime] == 'yes' || a.dates[datetime] == 'maybe'));
+    let valuesPositive = values.filter(v => v == constants.AVAILABILITY_YES || v == constants.AVAILABILITY_MAYBE);
+    let valuesYes = values.filter(v => v == constants.AVAILABILITY_YES);
+    let attendeesYes = attendees.filter(a => a.dates[datetime] == constants.AVAILABILITY_YES);
+    let valuesMaybe = values.filter(v => v == constants.AVAILABILITY_MAYBE);
+    let attendeesMaybe = attendees.filter(a => a.dates[datetime] == constants.AVAILABILITY_MAYBE);
+    let attendeesNo = attendees.filter(a => !(a.dates[datetime] == constants.AVAILABILITY_YES || a.dates[datetime] == constants.AVAILABILITY_MAYBE));
     let ratio = values.length > 0 ? Math.round((valuesMaybe.length / Math.max(1, valuesPositive.length)) * 4 ) / 4 : 0;
     let inverseRatio = values.length > 0 ? 1 - ratio : 0;
     let opacity = attendees.length > 0 ? Math.round((valuesPositive.length / attendees.length) * 100) / 100 : 0;
@@ -228,9 +229,9 @@ const startDrag = (dateIndex, timeIndex, selectOne) => {
     dragInfo.value.startTimeIndex = timeIndex;
     let value;
     switch(getAvailabilityByIndex(pageAwareIndex(dateIndex), timeIndex)){
-        case 'yes': value = 'maybe'; break;
-        case 'maybe': value = 'no'; break;
-        default: value = 'yes';
+        case constants.AVAILABILITY_YES: value = constants.AVAILABILITY_MAYBE; break;
+        case constants.AVAILABILITY_MAYBE: value = constants.AVAILABILITY_NO; break;
+        default: value = constants.AVAILABILITY_YES;
     }
     dragInfo.value.value = value;
     dragInfo.value.originalValues = {...availability.value.dates};
@@ -278,7 +279,7 @@ onMounted(() => {
 generateDays();
 
 watch(() => props.mode, () => {
-    if(props.mode == 'add') {
+    if(props.mode == constants.MEETING_MODE_ADD) {
         generateFreshAvailability();
     }
     gridSquareDisplayInfoCache.value = {};
@@ -295,7 +296,7 @@ const submit = () => {
 
 <template>
     <VAlert v-model="generalError" level="warning"></VAlert>
-    <component :is="props.mode == 'show' ? 'div' : 'form'" @submit.prevent="submit">
+    <component :is="props.mode == constants.MEETING_MODE_SHOW ? 'div' : 'form'" @submit.prevent="submit">
         <p class="text-center text-gray-800">{{ currentPaginatedMonths }}</p>
         <div class="relative flex items-center">
             <button dusk="prev-page-btn" type="button" class="absolute -left-6 cursor-pointer" v-if="!paginatedDays.isFirstPage" @click="page--">
@@ -346,12 +347,12 @@ const submit = () => {
                                 selectedDayIsSame(day, time) ? 'border-dashed border border-gray-600' : '',
                             ]"
                         >
-                            <div v-if="mode == 'add'" class="grid-square h-full flex items-center justify-center relative"
+                            <div v-if="mode == constants.MEETING_MODE_ADD" class="grid-square h-full flex items-center justify-center relative"
                                 draggable="false"
                                 :data-dateindex="dateIndex"
                                 :data-timeindex="timeIndex"
                                 :class="[
-                                    {'yes': 'bg-green-400', 'maybe': 'bg-yellow-300', 'no': ''}[getAvailability(day.date, time.time)]
+                                    {[constants.AVAILABILITY_YES]: 'bg-green-400', [constants.AVAILABILITY_MAYBE]: 'bg-yellow-300', [constants.AVAILABILITY_NO]: ''}[getAvailability(day.date, time.time)]
                                 ]"
                                 :dusk="'availability_selector_' + addDateAndTime(day.date, time.time).format('YYYY-MM-DD-HH-mm')"
                             >
@@ -360,8 +361,8 @@ const submit = () => {
                                     class="text-center text-gray-600 text-xs"
                                     :dusk="'availability_icon_' + addDateAndTime(day.date, time.time).format('YYYY-MM-DD-HH-mm')"
                                 >
-                                    <i class="far fa-circle-check" v-if="getAvailability(day.date, time.time) == 'yes'" aria-label="Yes"></i>
-                                    <i class="far fa-circle-question" v-else-if="getAvailability(day.date, time.time) == 'maybe'" aria-label="Maybe"></i>
+                                    <i class="far fa-circle-check" v-if="getAvailability(day.date, time.time) == constants.AVAILABILITY_YES" aria-label="Yes"></i>
+                                    <i class="far fa-circle-question" v-else-if="getAvailability(day.date, time.time) == constants.AVAILABILITY_MAYBE" aria-label="Maybe"></i>
                                     <span v-else class="sr-only">No</span>
                                 </div>
                                 <button type="button" class="absolute inset-0"
@@ -371,8 +372,8 @@ const submit = () => {
                                     @mouseenter="hoverEnter(dateIndex, timeIndex)"
                                     @pointermove="pointerMove"
                                     :dusk="'availability_btn_' + addDateAndTime(day.date, time.time).format('YYYY-MM-DD-HH-mm')">
-                                    <span class="sr-only" v-if="getAvailability(day.date, time.time) == 'yes'">Change to maybe</span>
-                                    <span class="sr-only" v-else="getAvailability(day.date, time.time) == 'maybe'">Change to no</span>
+                                    <span class="sr-only" v-if="getAvailability(day.date, time.time) == constants.AVAILABILITY_YES">Change to maybe</span>
+                                    <span class="sr-only" v-else="getAvailability(day.date, time.time) == constants.AVAILABILITY_MAYBE">Change to no</span>
                                     <span class="sr-only" v-else>Change to yes</span>
                                 </button>
                             </div>
@@ -461,7 +462,7 @@ const submit = () => {
                 <i class="fa fa-chevron-right text-3xl text-gray-300"></i>
             </button>
         </div>
-        <div class="flex gap-5 justify-between items-center" v-if="mode == 'show'">
+        <div class="flex gap-5 justify-between items-center" v-if="mode == constants.MEETING_MODE_SHOW">
             <p class="text-sm text-gray-500">Page {{ paginatedDays.currentPage + 1 }} / {{ paginatedDays.lastPage }}</p>
             <div class="flex items-center flex-1 gap-5">
                 <VLabel for="display_type" class="sr-only">Display Mode</VLabel>
@@ -474,7 +475,7 @@ const submit = () => {
                 </VSelect>
             </div>
         </div>
-        <div class="flex gap-5 justify-center items-center" v-if="mode == 'add' && paginatedDays.totalPages > 1">
+        <div class="flex gap-5 justify-center items-center" v-if="mode == constants.MEETING_MODE_ADD && paginatedDays.totalPages > 1">
             <VButton dusk="adding-prev-page-btn" type="button" size="sm" :disabled="paginatedDays.isFirstPage" @click="page--" class="flex-1 md:flex-auto">
                 <i class="fa fa-chevron-left"></i> Previous <span class="sr-only">Page</span>
             </VButton>
@@ -483,7 +484,7 @@ const submit = () => {
                 Next <span class="sr-only">Page</span> <i class="fa fa-chevron-right"></i>
             </VButton>
         </div>
-        <div v-if="props.mode == 'add'" class="flex items-center gap-5 mt-5">
+        <div v-if="props.mode == constants.MEETING_MODE_ADD" class="flex items-center gap-5 mt-5">
             <div class="flex-1">
                 <VLabel for="name" class="sr-only">Your Name</VLabel>
                 <VInput v-model="availability.name" placeholder="Add a name" id="name" name="name" required maxlength="128"></VInput>
