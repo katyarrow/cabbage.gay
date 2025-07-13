@@ -4,13 +4,12 @@ namespace Tests\Browser;
 
 use App\Models\User;
 use Hash;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class AdminLoginPageTest extends DuskTestCase
 {
-    public function testItLoadsTheLoginPage(): void
+    public function test_it_loads_the_login_page(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/admin');
@@ -23,7 +22,7 @@ class AdminLoginPageTest extends DuskTestCase
         });
     }
 
-    public function testItAllowsAdminsToLogIn(): void
+    public function test_it_allows_admins_to_log_in(): void
     {
         $this->browse(function (Browser $browser) {
             $password = str()->random();
@@ -41,7 +40,7 @@ class AdminLoginPageTest extends DuskTestCase
         });
     }
 
-    public function testItDoesNotAllowNonAdminsToLogIn(): void
+    public function test_it_does_not_allow_non_admins_to_log_in(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/admin');
