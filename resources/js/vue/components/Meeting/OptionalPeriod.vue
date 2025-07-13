@@ -282,6 +282,7 @@ watch(() => props.mode, () => {
     if(props.mode == constants.MEETING_MODE_ADD) {
         generateFreshAvailability();
     }
+    selectedDay.value = null;
     gridSquareDisplayInfoCache.value = {};
 })
 watch(() => props.selectedAttendee, () => {
