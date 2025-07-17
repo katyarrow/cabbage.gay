@@ -35,6 +35,8 @@ const availability = ref({
     name: null,
     dates: {},
 });
+const currentDiscoModeColorIndex = ref(0);
+const discoModeColors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
 
 const paginatedDays = computed(() => {
     let startIndex = perPage.value * page.value;
@@ -269,11 +271,18 @@ const pointerMove = (event) => {
     });
 }
 
+const setDiscoModeInterval = () => {
+    setInterval(() => {
+        currentDiscoModeColorIndex.value = (currentDiscoModeColorIndex.value + 1) % discoModeColors.length;
+    }, 300);
+}
+
 onMounted(() => {
     document.addEventListener('mouseup', stopDrag);
     document.addEventListener('touchend', stopDrag);
     addEventListener("resize", updatePageSize);
     updatePageSize();
+    setDiscoModeInterval();
 });
 
 generateDays();
@@ -446,8 +455,11 @@ const submit = () => {
                                     </div>
                                 </div>
                                 <div v-else-if="displayType == 'disco'"
-                                    class="h-full w-full relative select-none disco-mode flex items-center justify-center"
-                                    :style="{opacity: gridSquareDisplayInfo(day.date, time.time).opacity}">
+                                    class="h-full w-full relative select-none flex items-center justify-center transition-colors duration-150"
+                                    :style="{
+                                        opacity: gridSquareDisplayInfo(day.date, time.time).opacity,
+                                        'background-color': discoModeColors[currentDiscoModeColorIndex],
+                                    }">
                                     <i class="far fa-circle-check text-xs" v-if="props.symbolMode && gridSquareDisplayInfo(day.date, time.time).opacity > 0"></i>
                                     <span class="sr-only">{{ gridSquareDisplayInfo(day.date, time.time).total }} responses</span>
                                 </div>
