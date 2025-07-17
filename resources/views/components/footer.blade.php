@@ -10,4 +10,8 @@
     </ul>
     For more information see our <a href="{{ route('faq') }}" class="underline text-green-600">FAQ Page</a>. <br>
     View changes on the <a href="{{ route('releases') }}" class="underline text-green-600">Releases Page</a>.
+    @if (config('donate.active'))
+        <br>
+        Enjoying {{ config('app.name') }}? Consider <a href="{{ route('donate') }}" class="underline text-green-600">Donating</a>.
+    @endif
 </footer>
