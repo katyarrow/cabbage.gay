@@ -3,6 +3,7 @@ import 'vue-final-modal/style.css';
 import './bootstrap';
 import './crypt';
 import './pow';
+import './axios-interceptors';
 
 import CreateMeeting from './vue/CreateMeeting.vue';
 import ShowMeeting from './vue/ShowMeeting.vue';
