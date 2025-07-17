@@ -271,6 +271,30 @@ const pointerMove = (event) => {
     });
 }
 
+const swipePrevPage = () => {
+    if(props.mode == constants.MEETING_MODE_SHOW) {
+        prevPage();
+    }
+}
+
+const swipeNextPage = () => {
+    if(props.mode == constants.MEETING_MODE_SHOW) {
+        nextPage();
+    }
+}
+
+const prevPage = () => {
+    if(!paginatedDays.value.isFirstPage) {
+        page.value--;
+    }
+}
+
+const nextPage = () => {
+    if(!paginatedDays.value.isLastPage) {
+        page.value++;
+    }
+}
+
 const setDiscoModeInterval = () => {
     setInterval(() => {
         currentDiscoModeColorIndex.value = (currentDiscoModeColorIndex.value + 1) % discoModeColors.length;
@@ -309,11 +333,17 @@ const submit = () => {
     <component :is="props.mode == constants.MEETING_MODE_SHOW ? 'div' : 'form'" @submit.prevent="submit">
         <p class="text-center text-gray-800">{{ currentPaginatedMonths }}</p>
         <div class="relative flex items-center">
-            <button dusk="prev-page-btn" type="button" class="absolute -left-6 cursor-pointer" v-if="!paginatedDays.isFirstPage" @click="page--">
+            <button dusk="prev-page-btn" type="button" class="absolute -left-6 cursor-pointer" v-if="!paginatedDays.isFirstPage" @click="prevPage">
                 <span class="sr-only">Previous page</span>
                 <i class="fa fa-chevron-left text-3xl text-gray-300"></i>
             </button>
-            <table class="w-full my-5 table-fixed touch-none" ondragstart="return false;" ondragend="return false;" :key="JSON.stringify(props.selectedAttendee)">
+            <table
+                class="w-full my-5 table-fixed touch-none"
+                ondragstart="return false;"
+                ondragend="return false;"
+                :key="JSON.stringify(props.selectedAttendee)"
+                v-touch:swipe.left="swipeNextPage"
+                v-touch:swipe.right="swipePrevPage">
                 <thead>
                     <tr>
                         <th scope="col" class="w-11"><span class="sr-only">Times</span></th>
@@ -476,7 +506,7 @@ const submit = () => {
                     </tr>
                 </tbody>
             </table>
-            <button dusk="next-page-btn" type="button" class="absolute -right-6 cursor-pointer" v-if="!paginatedDays.isLastPage" @click="page++">
+            <button dusk="next-page-btn" type="button" class="absolute -right-6 cursor-pointer" v-if="!paginatedDays.isLastPage" @click="nextPage">
                 <span class="sr-only">Next page</span>
                 <i class="fa fa-chevron-right text-3xl text-gray-300"></i>
             </button>
@@ -496,11 +526,11 @@ const submit = () => {
             </div>
         </div>
         <div class="flex gap-5 justify-center items-center" v-if="mode == constants.MEETING_MODE_ADD && paginatedDays.totalPages > 1">
-            <VButton dusk="adding-prev-page-btn" type="button" size="sm" :disabled="paginatedDays.isFirstPage" @click="page--" class="flex-1 md:flex-auto">
+            <VButton dusk="adding-prev-page-btn" type="button" size="sm" :disabled="paginatedDays.isFirstPage" @click="prevPage" class="flex-1 md:flex-auto">
                 <i class="fa fa-chevron-left"></i> Previous <span class="sr-only">Page</span>
             </VButton>
             <p class="text-gray-500">Page {{ paginatedDays.currentPage + 1 }} / {{ paginatedDays.lastPage }}</p>
-            <VButton dusk="adding-next-page-btn" type="button" size="sm" :disabled="paginatedDays.isLastPage" @click="page++" class="flex-1 md:flex-auto">
+            <VButton dusk="adding-next-page-btn" type="button" size="sm" :disabled="paginatedDays.isLastPage" @click="nextPage" class="flex-1 md:flex-auto">
                 Next <span class="sr-only">Page</span> <i class="fa fa-chevron-right"></i>
             </VButton>
         </div>
