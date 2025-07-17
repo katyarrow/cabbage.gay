@@ -73,6 +73,10 @@ const updatePageSize = () => {
     } else {
         perPage.value = 4;
     }
+
+    if(page.value >= paginatedDays.value.totalPages) {
+        page.value = paginatedDays.value.totalPages - 1;
+    }
 }
 
 const generateDays = () => {
