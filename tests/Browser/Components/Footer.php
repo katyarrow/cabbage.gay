@@ -22,7 +22,7 @@ class Footer extends BaseComponent
     {
         $browser->assertVisible($this->selector());
         $browser->assertSeeIn($this->selector(), 'End to end encrypted meeting scheduler.');
-        $browser->assertSeeIn($this->selector() . ' a[href="' . route('faq') . '"]', 'FAQ Page');
+        $browser->assertSeeIn($this->selector().' a[href="'.route('faq').'"]', 'FAQ Page');
     }
 
     /**

@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 
 class RefreshCsrfTokenController extends Controller
 {
-    public function store(Request $request): JsonResponse {
+    public function store(Request $request): JsonResponse
+    {
         $request->session()->regenerateToken();
 
         return response()->json();

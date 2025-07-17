@@ -41,11 +41,11 @@ class EntirePeriodMeetingTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $day1 = now()->addDays(1);
-            $day1Text = 'availability_' . $day1->format('Ymd');
+            $day1Text = 'availability_'.$day1->format('Ymd');
             $day2 = now()->addDays(2);
-            $day2Text = 'availability_' . $day2->format('Ymd');
+            $day2Text = 'availability_'.$day2->format('Ymd');
             $day3 = now()->addDays(3);
-            $day3Text = 'availability_' . $day3->format('Ymd');
+            $day3Text = 'availability_'.$day3->format('Ymd');
 
             $browser->createMeeting([
                 'name' => 'Meeting name 312',
@@ -73,28 +73,28 @@ class EntirePeriodMeetingTest extends DuskTestCase
 
             // Checking if inputs for availability exist
             $browser->assertSee($day1->format('D jS M'));
-            $browser->assertPresent('input[name="' . $day1Text . '"][value="yes"]');
-            $browser->assertPresent('input[name="' . $day1Text . '"][value="maybe"]');
-            $browser->assertPresent('input[name="' . $day1Text . '"][value="no"]');
+            $browser->assertPresent('input[name="'.$day1Text.'"][value="yes"]');
+            $browser->assertPresent('input[name="'.$day1Text.'"][value="maybe"]');
+            $browser->assertPresent('input[name="'.$day1Text.'"][value="no"]');
 
             $browser->assertSee($day2->format('D jS M'));
-            $browser->assertPresent('input[name="' . $day2Text . '"][value="yes"]');
-            $browser->assertPresent('input[name="' . $day2Text . '"][value="maybe"]');
-            $browser->assertPresent('input[name="' . $day2Text . '"][value="no"]');
+            $browser->assertPresent('input[name="'.$day2Text.'"][value="yes"]');
+            $browser->assertPresent('input[name="'.$day2Text.'"][value="maybe"]');
+            $browser->assertPresent('input[name="'.$day2Text.'"][value="no"]');
 
             $browser->assertSee($day3->format('D jS M'));
-            $browser->assertPresent('input[name="' . $day3Text . '"][value="yes"]');
-            $browser->assertPresent('input[name="' . $day3Text . '"][value="maybe"]');
-            $browser->assertPresent('input[name="' . $day3Text . '"][value="no"]');
+            $browser->assertPresent('input[name="'.$day3Text.'"][value="yes"]');
+            $browser->assertPresent('input[name="'.$day3Text.'"][value="maybe"]');
+            $browser->assertPresent('input[name="'.$day3Text.'"][value="no"]');
 
             $browser->assertRadioSelected($day1Text, 'no');
             $browser->assertRadioSelected($day2Text, 'no');
             $browser->assertRadioSelected($day3Text, 'no');
 
             // select values and submit
-            $browser->click('input[name="' . $day1Text . '"][value="yes"] + span');
-            $browser->click('input[name="' . $day2Text . '"][value="maybe"] + span');
-            $browser->click('input[name="' . $day3Text . '"][value="no"] + span');
+            $browser->click('input[name="'.$day1Text.'"][value="yes"] + span');
+            $browser->click('input[name="'.$day2Text.'"][value="maybe"] + span');
+            $browser->click('input[name="'.$day3Text.'"][value="no"] + span');
 
             $browser->assertRadioSelected($day1Text, 'yes');
             $browser->assertRadioSelected($day2Text, 'maybe');
@@ -107,17 +107,17 @@ class EntirePeriodMeetingTest extends DuskTestCase
             $browser->assertSee('Responses (1)');
             $browser->assertSee('blah123');
 
-            $browser->assertSeeIn('@' . $day1Text . '_yes', 1);
-            $browser->assertSeeIn('@' . $day1Text . '_maybe', 0);
-            $browser->assertSeeIn('@' . $day1Text . '_no', 0);
+            $browser->assertSeeIn('@'.$day1Text.'_yes', 1);
+            $browser->assertSeeIn('@'.$day1Text.'_maybe', 0);
+            $browser->assertSeeIn('@'.$day1Text.'_no', 0);
 
-            $browser->assertSeeIn('@' . $day2Text . '_yes', 0);
-            $browser->assertSeeIn('@' . $day2Text . '_maybe', 1);
-            $browser->assertSeeIn('@' . $day2Text . '_no', 0);
+            $browser->assertSeeIn('@'.$day2Text.'_yes', 0);
+            $browser->assertSeeIn('@'.$day2Text.'_maybe', 1);
+            $browser->assertSeeIn('@'.$day2Text.'_no', 0);
 
-            $browser->assertSeeIn('@' . $day3Text . '_yes', 0);
-            $browser->assertSeeIn('@' . $day3Text . '_maybe', 0);
-            $browser->assertSeeIn('@' . $day3Text . '_no', 1);
+            $browser->assertSeeIn('@'.$day3Text.'_yes', 0);
+            $browser->assertSeeIn('@'.$day3Text.'_maybe', 0);
+            $browser->assertSeeIn('@'.$day3Text.'_no', 1);
 
             // Check submission went correctly after page refresh.
             $browser->refresh();
@@ -130,23 +130,23 @@ class EntirePeriodMeetingTest extends DuskTestCase
             $browser->assertSee('Responses (1)');
             $browser->assertSee('blah123');
 
-            $browser->assertSeeIn('@' . $day1Text . '_yes', 1);
-            $browser->assertSeeIn('@' . $day1Text . '_maybe', 0);
-            $browser->assertSeeIn('@' . $day1Text . '_no', 0);
+            $browser->assertSeeIn('@'.$day1Text.'_yes', 1);
+            $browser->assertSeeIn('@'.$day1Text.'_maybe', 0);
+            $browser->assertSeeIn('@'.$day1Text.'_no', 0);
 
-            $browser->assertSeeIn('@' . $day2Text . '_yes', 0);
-            $browser->assertSeeIn('@' . $day2Text . '_maybe', 1);
-            $browser->assertSeeIn('@' . $day2Text . '_no', 0);
+            $browser->assertSeeIn('@'.$day2Text.'_yes', 0);
+            $browser->assertSeeIn('@'.$day2Text.'_maybe', 1);
+            $browser->assertSeeIn('@'.$day2Text.'_no', 0);
 
-            $browser->assertSeeIn('@' . $day3Text . '_yes', 0);
-            $browser->assertSeeIn('@' . $day3Text . '_maybe', 0);
-            $browser->assertSeeIn('@' . $day3Text . '_no', 1);
+            $browser->assertSeeIn('@'.$day3Text.'_yes', 0);
+            $browser->assertSeeIn('@'.$day3Text.'_maybe', 0);
+            $browser->assertSeeIn('@'.$day3Text.'_no', 1);
 
             // Make another submission
             $browser->click('@add-availability-btn');
-            $browser->click('input[name="' . $day1Text . '"][value="yes"] + span');
-            $browser->click('input[name="' . $day2Text . '"][value="yes"] + span');
-            $browser->click('input[name="' . $day3Text . '"][value="no"] + span');
+            $browser->click('input[name="'.$day1Text.'"][value="yes"] + span');
+            $browser->click('input[name="'.$day2Text.'"][value="yes"] + span');
+            $browser->click('input[name="'.$day3Text.'"][value="no"] + span');
             $browser->type('name', 'test321');
 
             $browser->click('@finish-button');
@@ -157,17 +157,17 @@ class EntirePeriodMeetingTest extends DuskTestCase
             $browser->assertSee('blah123');
             $browser->assertSee('test321');
 
-            $browser->assertSeeIn('@' . $day1Text . '_yes', 2);
-            $browser->assertSeeIn('@' . $day1Text . '_maybe', 0);
-            $browser->assertSeeIn('@' . $day1Text . '_no', 0);
+            $browser->assertSeeIn('@'.$day1Text.'_yes', 2);
+            $browser->assertSeeIn('@'.$day1Text.'_maybe', 0);
+            $browser->assertSeeIn('@'.$day1Text.'_no', 0);
 
-            $browser->assertSeeIn('@' . $day2Text . '_yes', 1);
-            $browser->assertSeeIn('@' . $day2Text . '_maybe', 1);
-            $browser->assertSeeIn('@' . $day2Text . '_no', 0);
+            $browser->assertSeeIn('@'.$day2Text.'_yes', 1);
+            $browser->assertSeeIn('@'.$day2Text.'_maybe', 1);
+            $browser->assertSeeIn('@'.$day2Text.'_no', 0);
 
-            $browser->assertSeeIn('@' . $day3Text . '_yes', 0);
-            $browser->assertSeeIn('@' . $day3Text . '_maybe', 0);
-            $browser->assertSeeIn('@' . $day3Text . '_no', 2);
+            $browser->assertSeeIn('@'.$day3Text.'_yes', 0);
+            $browser->assertSeeIn('@'.$day3Text.'_maybe', 0);
+            $browser->assertSeeIn('@'.$day3Text.'_no', 2);
 
             // Check submission went correctly after page refresh.
             $browser->refresh();
@@ -181,17 +181,17 @@ class EntirePeriodMeetingTest extends DuskTestCase
             $browser->assertSee('blah123');
             $browser->assertSee('test321');
 
-            $browser->assertSeeIn('@' . $day1Text . '_yes', 2);
-            $browser->assertSeeIn('@' . $day1Text . '_maybe', 0);
-            $browser->assertSeeIn('@' . $day1Text . '_no', 0);
+            $browser->assertSeeIn('@'.$day1Text.'_yes', 2);
+            $browser->assertSeeIn('@'.$day1Text.'_maybe', 0);
+            $browser->assertSeeIn('@'.$day1Text.'_no', 0);
 
-            $browser->assertSeeIn('@' . $day2Text . '_yes', 1);
-            $browser->assertSeeIn('@' . $day2Text . '_maybe', 1);
-            $browser->assertSeeIn('@' . $day2Text . '_no', 0);
+            $browser->assertSeeIn('@'.$day2Text.'_yes', 1);
+            $browser->assertSeeIn('@'.$day2Text.'_maybe', 1);
+            $browser->assertSeeIn('@'.$day2Text.'_no', 0);
 
-            $browser->assertSeeIn('@' . $day3Text . '_yes', 0);
-            $browser->assertSeeIn('@' . $day3Text . '_maybe', 0);
-            $browser->assertSeeIn('@' . $day3Text . '_no', 2);
+            $browser->assertSeeIn('@'.$day3Text.'_yes', 0);
+            $browser->assertSeeIn('@'.$day3Text.'_maybe', 0);
+            $browser->assertSeeIn('@'.$day3Text.'_no', 2);
 
         });
     }
@@ -200,9 +200,9 @@ class EntirePeriodMeetingTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $day1 = now()->addDays(1);
-            $day1Text = 'availability_' . $day1->format('Ymd');
+            $day1Text = 'availability_'.$day1->format('Ymd');
             $day2 = now()->addDays(2);
-            $day2Text = 'availability_' . $day2->format('Ymd');
+            $day2Text = 'availability_'.$day2->format('Ymd');
 
             $browser->createMeeting([
                 'name' => 'Meeting name 312',
@@ -224,8 +224,8 @@ class EntirePeriodMeetingTest extends DuskTestCase
             $browser->type('name', 'blah123');
 
             // select values and submit
-            $browser->click('input[name="' . $day1Text . '"][value="yes"] + span');
-            $browser->click('input[name="' . $day2Text . '"][value="maybe"] + span');
+            $browser->click('input[name="'.$day1Text.'"][value="yes"] + span');
+            $browser->click('input[name="'.$day2Text.'"][value="maybe"] + span');
 
             $browser->assertRadioSelected($day1Text, 'yes');
             $browser->assertRadioSelected($day2Text, 'maybe');

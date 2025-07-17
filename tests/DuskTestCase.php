@@ -31,11 +31,11 @@ abstract class DuskTestCase extends BaseTestCase
         });
 
         Browser::macro('assertHasHeader', function (): Browser {
-            return $this->within(new Header, function(Browser $browser) {});
+            return $this->within(new Header, function (Browser $browser) {});
         });
 
         Browser::macro('assertHasFooter', function (): Browser {
-            return $this->within(new Footer, function(Browser $browser) {});
+            return $this->within(new Footer, function (Browser $browser) {});
         });
 
         Browser::macro('assertHasHeaderAndFooter', function (): Browser {
@@ -48,37 +48,39 @@ abstract class DuskTestCase extends BaseTestCase
                 "document.querySelector('$selector').value = '$dateString'",
                 "document.querySelector('$selector').dispatchEvent(new Event('change'))",
             ]);
+
             return $this;
         });
 
-        Browser::macro('createMeeting', function (array $data=[]): Browser {
+        Browser::macro('createMeeting', function (array $data = []): Browser {
             $this->visit('/');
             $this->type('name', $data['name'] ?? str()->random());
-            if(array_key_exists('entire_period', $data) && $data['entire_period']) {
+            if (array_key_exists('entire_period', $data) && $data['entire_period']) {
                 $this->check('entire_period');
             }
-            if(array_key_exists('start_date', $data)) {
+            if (array_key_exists('start_date', $data)) {
                 $this->typeDateField('#start_date', $data['start_date']);
             }
-            if(array_key_exists('end_date', $data)) {
+            if (array_key_exists('end_date', $data)) {
                 $this->typeDateField('#end_date', $data['end_date']);
             }
-            if(array_key_exists('start_time', $data)) {
+            if (array_key_exists('start_time', $data)) {
                 $this->select('start_time', $data['start_time']);
             }
-            if(array_key_exists('end_time', $data)) {
+            if (array_key_exists('end_time', $data)) {
                 $this->select('end_time', $data['end_time']);
             }
-            if(array_key_exists('destroy_at', $data)) {
+            if (array_key_exists('destroy_at', $data)) {
                 $this->typeDateField('#destroy_at', $data['destroy_at']);
             }
-            if(array_key_exists('timezone', $data)) {
+            if (array_key_exists('timezone', $data)) {
                 $this->select('timezone', $data['timezone']);
             }
 
             $this->press('button[type="submit"]');
 
             $this->waitForReload();
+
             return $this;
         });
 

@@ -3,8 +3,6 @@
 namespace Tests\Browser;
 
 use Laravel\Dusk\Browser;
-use Tests\Browser\Components\Footer;
-use Tests\Browser\Components\Header;
 use Tests\DuskTestCase;
 
 class ReleasesPageTest extends DuskTestCase

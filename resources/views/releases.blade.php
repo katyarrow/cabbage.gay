@@ -17,6 +17,7 @@
         <li class="my-3">Added disco animation.</li>
         <li class="my-3">Allow swiping on optional period meeting when not in add availability mode.</li>
         <li class="my-3">Added releases page.</li>
+        <li class="my-3">Fixed issue when increasing size of viewport from on last page of a meeting.</li>
         <li class="my-3">Made various code improvements.</li>
     </ul>
 
