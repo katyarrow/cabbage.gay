@@ -152,11 +152,17 @@ const setMode = modeToSet => {
 <template>
     <div aria-live="polite">
         <VAlert v-model="globalError"></VAlert>
-        <div v-if="!loaded || posting" class="flex items-center justify-center mt-10">
+        <div v-if="!loaded" class="flex items-center justify-center mt-10">
             <span class="animate-pulse font-semibold text-2xl" v-if="!loaded">Loading...</span>
-            <span class="animate-pulse font-semibold text-2xl" v-if="posting">Sending data...</span>
         </div>
-        <div v-else :class="meeting.entire_period ? '' : 'px-5'">
+        <div
+            v-else
+            :class="[
+                meeting.entire_period ? '' : 'px-5',
+                posting ? 'hidden' : ''
+            ]"
+            :aria-hidden="posting"
+        >
             <div class="grid grid-cols-2 py-3">
                 <div class="flex flex-col">
                     <div class="flex items-center">
@@ -277,6 +283,9 @@ const setMode = modeToSet => {
                     </ul>
                 </div>
             </div>
+        </div>
+        <div v-if="posting" class="flex items-center justify-center mt-10">
+            <span class="animate-pulse font-semibold text-2xl">Sending data...</span>
         </div>
         <p class="text-center text-gray-700 font-medium mt-20">
             This poll will self destruct on the {{ moment(meeting.destroy_at).format('Do of MMMM YYYY') }}
