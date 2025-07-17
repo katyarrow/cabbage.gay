@@ -8,5 +8,6 @@
         <li class="list-inside">Encryption keys: used to verify data (encrypted where appropriate).</li>
         <li class="list-inside">Session cookies: used for cross-site request forgery prevention.</li>
     </ul>
-    For more information see our <a href="{{ route('faq') }}" class="underline text-green-600">FAQ Page</a>.
+    For more information see our <a href="{{ route('faq') }}" class="underline text-green-600">FAQ Page</a>. <br>
+    View changes on the <a href="{{ route('releases') }}" class="underline text-green-600">Releases Page</a>.
 </footer>
