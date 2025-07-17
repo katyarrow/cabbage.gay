@@ -445,6 +445,12 @@ const submit = () => {
                                         </span>
                                     </div>
                                 </div>
+                                <div v-else-if="displayType == 'disco'"
+                                    class="h-full w-full relative select-none disco-mode flex items-center justify-center"
+                                    :style="{opacity: gridSquareDisplayInfo(day.date, time.time).opacity}">
+                                    <i class="far fa-circle-check text-xs" v-if="props.symbolMode && gridSquareDisplayInfo(day.date, time.time).opacity > 0"></i>
+                                    <span class="sr-only">{{ gridSquareDisplayInfo(day.date, time.time).total }} responses</span>
+                                </div>
                                 <button
                                     type="button"
                                     class="box-border absolute inset-0 hover:border border-dashed"
@@ -473,6 +479,7 @@ const submit = () => {
                     <option value="gradient">Gradient</option>
                     <option value="numbers">Numbers</option>
                     <option value="gradient_numbers">Gradient + Numbers</option>
+                    <option value="disco">DISCO (warning: flashing lights)</option>
                 </VSelect>
             </div>
         </div>

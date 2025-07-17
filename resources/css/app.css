@@ -4,3 +4,29 @@
 
 @config "../../tailwind.config.js";
 @source "..views";
+
+.disco-mode {
+  animation: disco-mode 2s infinite;
+  transition: background-color 333ms ease;
+}
+
+@keyframes disco-mode {
+  0% {
+     background-color: red;
+  }
+  20% {
+     background-color: orange;
+  }
+  40% {
+     background-color: yellow;
+  }
+  60% {
+     background-color: green;
+  }
+  80% {
+     background-color: blue;
+  }
+  100% {
+     background-color: violet;
+  }
+}
