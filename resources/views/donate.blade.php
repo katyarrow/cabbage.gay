@@ -13,7 +13,13 @@
         </p>
         @if (config('donate.monero_address'))
             <h2 class="text-xl font-semibold tracking-wider mt-10">Monero</h2>
-            <p class="break-all">Address: {{ config('donate.monero_address') }}</p>
+            <p class="break-all">
+                Address:
+                <a href="monero:{{ config('donate.monero_address') }}?tx_description=donation"
+                    class="text-xs underline text-green-600">
+                    {{ config('donate.monero_address') }}
+                </a>
+            </p>
         @endif
         @if (config('donate.email_address'))
             <h2 class="text-xl font-semibold tracking-wider mt-10">Other Ways</h2>
