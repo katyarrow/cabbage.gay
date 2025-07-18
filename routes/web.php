@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/faq', [FAQController::class, 'index'])->name('faq');
 Route::get('/releases', [ReleasesController::class, 'index'])->name('releases');
-Route::get('/donate', [DonateController::class, 'index'])->name('donate');
+if (config('donate.active')) {
+    Route::get('/donate', [DonateController::class, 'index'])->name('donate');
+}
 Route::post('/meeting', [MeetingController::class, 'store'])->name('meeting.store');
 Route::get('/meeting/{meeting:identifier}', [MeetingController::class, 'show'])->name('meeting.show');
 Route::post('/meeting/{meeting:identifier}/attendee/store', [MeetingAttendeeController::class, 'store'])->name('meeting.attendee.store');
