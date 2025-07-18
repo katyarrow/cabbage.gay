@@ -13,6 +13,7 @@
 - Allow swiping on optional period meeting when not in add availability mode.
 - Added releases page.
 - Fixed issue when increasing size of viewport from on last page of a meeting.
+- Added donation page.
 - Made various code improvements.
 
 ## v1.0.0
