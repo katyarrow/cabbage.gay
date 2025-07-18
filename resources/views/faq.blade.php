@@ -56,7 +56,11 @@
             <h2 class="text-xl font-semibold tracking-wider text-left">5. Is this a paid service?</h2>
             <p>
                 No, this site will not be paywalled or make money off you in any other way
-                (though a donation link may be set up in future to cover maintenance and upkeep).
+                @if (config('donate.active'))
+                    (though we do have ways to <a href="{{ route('donate') }}" class="underline text-green-600">donate to the project</a> if you are enjoying it).
+                @else
+                    (though a donation link may be set up in future to cover maintenance and upkeep).
+                @endif
             </p>
         </li>
         <li class="my-10">
