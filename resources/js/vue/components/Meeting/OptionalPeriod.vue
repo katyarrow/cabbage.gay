@@ -18,7 +18,10 @@ const props = defineProps({
     userTimezone: String,
 });
 
-const emit = defineEmits(['submit']);
+const emit = defineEmits([
+    'submit',
+    'do-add-availability-shake',
+]);
 const selectedAttendee = defineModel('selectedAttendee', {type: Object, default: null});
 const selectedDay = defineModel('selectedDay', {type: Object, default: null});
 
@@ -305,6 +308,10 @@ const setDiscoModeInterval = () => {
     }, 300);
 }
 
+const doAddAvailabilityShake = () => {
+    emit('do-add-availability-shake');
+}
+
 onMounted(() => {
     document.addEventListener('mouseup', stopDrag);
     document.addEventListener('touchend', stopDrag);
@@ -421,7 +428,7 @@ const submit = () => {
                                     <span class="sr-only" v-else>Change to yes</span>
                                 </button>
                             </div>
-                            <div v-else class="h-full">
+                            <div v-else class="h-full" @pointerdown="!gridSquareDisplayInfo(day.date, time.time).total ? doAddAvailabilityShake() : null">
                                 <div v-if="displayType == 'proportion' || props.selectedAttendee" class="h-full w-full relative select-none" :style="{opacity: gridSquareDisplayInfo(day.date, time.time).opacity}">
                                     <div
                                         class="bg-yellow-300 inline-flex items-center justify-center absolute top-0 bottom-0 left-0"
