@@ -4,6 +4,12 @@
 >
     <h1 class="text-3xl font-semibold tracking-wider text-center mb-5">Releases</h1>
 
+    <h2 class="text-xl font-semibold tracking-wider text-left mt-10">v1.1.1</h2>
+    <p>20/02/2026 Minor security update.</p>
+    <ul class="list-disc ml-5">
+        <li class="my-3">Updated backend and frontend for security.</li>
+    </ul>
+
     <h2 class="text-xl font-semibold tracking-wider text-left mt-10">v1.1.0</h2>
     <p>17/07/2025 Fixing bugs, adding minor features, etc.</p>
     <ul class="list-disc ml-5">
