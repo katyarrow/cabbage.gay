@@ -1,5 +1,9 @@
 # Releases
 
+## v1.1.1
+20/02/2026 Minor security update.
+- Updated backend and frontend for security.
+
 ## v1.1.0
 17/07/2025 Fixing bugs, adding minor features, etc.
 - Updated backend and frontend for security.
