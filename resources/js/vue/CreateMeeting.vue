@@ -11,6 +11,7 @@ import { onMounted, ref, useTemplateRef, watch } from 'vue';
 import { useValidation } from './composables/validation';
 import moment from 'moment-timezone';
 import PowCaptcha from './components/PowCaptcha.vue';
+import DonationMessage from './components/DonationMessage.vue';
 import VError from './components/VError.vue';
 
 const props = defineProps({
@@ -253,12 +254,13 @@ onMounted(() => {
         </div>
 
         <div class="text-right mt-10">
-            <div class="text-center flex justify-center">
+            <div class="text-center flex flex-col justify-center items-center gap-10">
                 <PowCaptcha
                     ref="captcha"
                     :challenge-route="props.captchaChallengeRoute"
                     @completed="submit"
                 ></PowCaptcha>
+                <DonationMessage v-if="captchaVerifying"></DonationMessage>
             </div>
             <VButton v-if="!captchaVerifying" type="submit" size="lg">Create!</VButton>
         </div>

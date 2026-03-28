@@ -5,6 +5,13 @@
     <h1 class="text-3xl font-semibold tracking-wider text-center mb-5">Releases</h1>
 
     <h2 class="text-xl font-semibold tracking-wider text-left mt-10">v1.1.1</h2>
+    <p>28/03/2026 security update, donation prompt.</p>
+    <ul class="list-disc ml-5">
+        <li class="my-3">Updated backend and frontend for security.</li>
+        <li class="my-3">Added a donation prompt when creating a meeting as well as a button in the header.</li>
+    </ul>
+
+    <h2 class="text-xl font-semibold tracking-wider text-left mt-10">v1.1.1</h2>
     <p>20/02/2026 Minor security update.</p>
     <ul class="list-disc ml-5">
         <li class="my-3">Updated backend and frontend for security.</li>

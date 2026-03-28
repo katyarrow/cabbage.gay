@@ -1,5 +1,10 @@
 # Releases
 
+# v1.2.0
+28/03/2026 security update, donation prompt.
+- Updated backend and frontend for security.
+- Added a donation prompt when creating a meeting as well as a button in the header.
+
 ## v1.1.1
 20/02/2026 Minor security update.
 - Updated backend and frontend for security.
