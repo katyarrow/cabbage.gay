@@ -6,8 +6,11 @@ import './pow';
 import './axios-interceptors';
 
 import CreateMeeting from './vue/CreateMeeting.vue';
+import CreateRota from './vue/CreateRota.vue';
 import ShowMeeting from './vue/ShowMeeting.vue';
+import ShowRota from './vue/ShowRota.vue';
 import PowCaptcha from './vue/components/PowCaptcha.vue';
+import VButton from './vue/components/VButton.vue';
 
 import Vue3TouchEvents from "vue3-touch-events";
 
@@ -18,7 +21,10 @@ const vfm = createVfm()
 app.use(vfm);
 
 app.component('CreateMeeting', CreateMeeting);
+app.component('CreateRota', CreateRota);
+app.component('VButton', VButton);
 app.component('ShowMeeting', ShowMeeting);
+app.component('ShowRota', ShowRota);
 app.component('PowCaptcha', PowCaptcha);
 
 app.use(Vue3TouchEvents);

@@ -12,6 +12,7 @@ use App\Http\Controllers\MeetingAttendeeController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\RefreshCsrfTokenController;
 use App\Http\Controllers\ReleasesController;
+use App\Http\Controllers\RotaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -20,10 +21,17 @@ Route::get('/releases', [ReleasesController::class, 'index'])->name('releases');
 if (config('donate.active')) {
     Route::get('/donate', [DonateController::class, 'index'])->name('donate');
 }
+
+Route::get('/meeting', [MeetingController::class, 'create'])->name('meeting.create');
 Route::post('/meeting', [MeetingController::class, 'store'])->name('meeting.store');
 Route::get('/meeting/{meeting:identifier}', [MeetingController::class, 'show'])->name('meeting.show');
 Route::post('/meeting/{meeting:identifier}/attendee/store', [MeetingAttendeeController::class, 'store'])->name('meeting.attendee.store');
 Route::post('/meeting/attendee/{attendee:identifier}/destroy', [MeetingAttendeeController::class, 'destroy'])->name('meeting.attendee.destroy');
+
+Route::get('/rota', [RotaController::class, 'create'])->name('rota.create');
+Route::post('/rota', [RotaController::class, 'store'])->name('rota.store');
+Route::get('/rota/{rota:identifier}', [RotaController::class, 'show'])->name('rota.show');
+
 Route::get('/captcha/get-challenge', [CaptchaController::class, 'index'])->name('captcha.index');
 Route::post('/captcha/verify/{captcha}', [CaptchaController::class, 'verify'])->name('captcha.verify');
 Route::get('/refresh-csrf-token', [RefreshCsrfTokenController::class, 'store'])->name('refresh-csrf-token');

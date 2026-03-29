@@ -1,6 +1,6 @@
 <footer class="text-center mb-3 text-sm">
     <div class="border-t border-gray-200 max-w-screen mx-auto py-2"></div>
-    End to end encrypted meeting scheduler.<br/>
+    End to end encrypted scheduler.<br/>
     We do not store data on you beyond what is required for the sites functioning.<br/>
     Data we store includes:
     <ul class="list-disc">
