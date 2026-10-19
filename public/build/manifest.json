@@ -1,4 +1,8 @@
 {
+  "_pusher-BWIgFNLk.js": {
+    "file": "assets/pusher-BWIgFNLk.js",
+    "name": "pusher"
+  },
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf": {
     "file": "assets/fa-brands-400-D1LuMI3I.ttf",
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf"
@@ -32,7 +36,7 @@
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BuRex2m0.css",
+    "file": "assets/app-CG0HxAyj.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -65,12 +69,24 @@
     "src": "resources/fonts/advent-pro/advent-pro.thin.ttf"
   },
   "resources/js/app.js": {
-    "file": "assets/app-B6G08arP.js",
+    "file": "assets/app-DuXjCHde.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "imports": [
+      "_pusher-BWIgFNLk.js"
+    ],
     "css": [
       "assets/app-DqeZVk2a.css"
+    ]
+  },
+  "resources/js/broadcasting.js": {
+    "file": "assets/broadcasting-Dio-rxl7.js",
+    "name": "broadcasting",
+    "src": "resources/js/broadcasting.js",
+    "isEntry": true,
+    "imports": [
+      "_pusher-BWIgFNLk.js"
     ]
   }
 }

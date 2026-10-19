@@ -47,7 +47,7 @@ class RotaRequest extends FormRequest
     public function save(Rota $rota)
     {
         do {
-            $identifier = str()->random(10);
+            $identifier = str()->random(16);
         } while (Rota::identifier($identifier)->exists());
         $rota->identifier = $identifier;
         $rota->private_key = $this->private_key;

@@ -31,6 +31,7 @@ Route::post('/meeting/attendee/{attendee:identifier}/destroy', [MeetingAttendeeC
 Route::get('/rota', [RotaController::class, 'create'])->name('rota.create');
 Route::post('/rota', [RotaController::class, 'store'])->name('rota.store');
 Route::get('/rota/{rota:identifier}', [RotaController::class, 'show'])->name('rota.show');
+Route::post('/rota/{rota:identifier}', [RotaController::class, 'update'])->name('rota.update');
 
 Route::get('/captcha/get-challenge', [CaptchaController::class, 'index'])->name('captcha.index');
 Route::post('/captcha/verify/{captcha}', [CaptchaController::class, 'verify'])->name('captcha.verify');

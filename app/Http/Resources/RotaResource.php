@@ -20,6 +20,7 @@ class RotaResource extends JsonResource
             'data' => $this->data,
             'destroy_at' => $this->destroy_at,
             'show_route' => route('rota.show', $this),
+            'update_route' => route('rota.update', $this),
         ];
     }
 }

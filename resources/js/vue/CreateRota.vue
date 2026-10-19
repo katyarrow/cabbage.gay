@@ -1,13 +1,11 @@
 <script setup>
 
 import VInput from './components/VInput.vue';
-import VSelect from './components/VSelect.vue';
-import VCheckbox from './components/VCheckbox.vue';
 import VLabel from './components/VLabel.vue';
 import VLegend from './components/VLegend.vue';
 import VButton from './components/VButton.vue';
 import VAlert from './components/VAlert.vue';
-import { onMounted, ref, useTemplateRef, watch } from 'vue';
+import { ref, useTemplateRef, watch } from 'vue';
 import { useValidation } from './composables/validation';
 import moment from 'moment-timezone';
 import PowCaptcha from './components/PowCaptcha.vue';
@@ -28,45 +26,11 @@ const times = [
 const generatingStatus = ref(null);
 const captchaVerifying = ref(false);
 const globalError = ref(null);
-const selectSpecificDates = ref(false);
 const formErrors = ref({});
 const form = ref({
     name: null,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    entire_period: false,
-    start_date: moment().format('YYYY-MM-DD'),
-    end_date: moment().add(6, 'day').format('YYYY-MM-DD'),
-    start_time: '09:00',
-    end_time: '17:00',
     destroy_at: moment().add(6, 'day').format('YYYY-MM-DD'),
 });
-
-watch(() => form.value.end_date, () => {
-    form.value.destroy_at = form.value.end_date;
-});
-
-const datesSelected = ref([]);
-const generateDatesSelected = () => {
-    datesSelected.value = [];
-    const startDate = moment(form.value.start_date, 'YYYY-MM-DD');
-    const endDate = moment(form.value.end_date, 'YYYY-MM-DD');
-    if(!startDate.isValid() || !endDate.isValid()) {
-        selectSpecificDates.value = false;
-        return;
-    }
-    const current = startDate.clone();
-    while(current <= endDate) {
-        let date = current.clone();
-        let datestring = current.format('YYYY-MM-DD');
-        datesSelected.value.push({
-            date: date,
-            datestring: datestring,
-            selected: true,
-        });
-        current.add(1, 'day');
-    }
-}
-watch(() => form.value.start_date + '|' + form.value.end_date, generateDatesSelected);
 
 const captcha = useTemplateRef('captcha');
 
@@ -86,13 +50,17 @@ const submit = (captchaToken) => {
 
     let dataForm = {
         name: form.value.name,
-        timezone: form.value.timezone,
-        entire_period: form.value.entire_period,
-        start_date: form.value.start_date,
-        end_date: form.value.end_date,
-        dates: datesSelected.value.filter(d => d.selected).map(d => d.datestring),
-        start_time: form.value.start_time,
-        end_time: form.value.end_time,
+        roles: [
+            {name: 'Availability', id: 1}
+        ],
+        timeslots: [
+            {name: '12pm-1pm', id: 1},
+            {name: '1pm-2pm', id: 2},
+            {name: '2pm-3pm', id: 3},
+            {name: '3pm-4pm', id: 4},
+            {name: '4pm-5pm', id: 5},
+        ],
+        people: [],
     };
 
     let encryptedForm = {
@@ -127,26 +95,10 @@ const submit = (captchaToken) => {
 const validateForm = () => {
     formErrors.value = validate({
         name: ['required', 'maxLen:100'],
-        timezone: ['required'],
-        start_date: ['required', 'date', 'dateEqualOrAfter:today'],
-        end_date: ['required', 'date', 'dateEqualOrAfter:start_date'],
-        start_time: ['required', 'time'],
-        end_time: ['required', 'time'],
         destroy_at: ['required', 'date', 'dateEqualOrAfter:tomorrow'],
     }, form.value);
     return Object.values(formErrors.value).length == 0;
 }
-
-const timeGt = (time1, time2) => {
-    return moment(time1, 'HH:mm') > moment(time2, 'HH:mm');
-}
-const timeLt = (time1, time2) => {
-    return moment(time1, 'HH:mm') < moment(time2, 'HH:mm');
-}
-
-onMounted(() => {
-    generateDatesSelected();
-});
 
 </script>
 

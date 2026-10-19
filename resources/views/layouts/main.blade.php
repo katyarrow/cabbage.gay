@@ -27,12 +27,18 @@
         @if ($attributes->has('noindex'))
             <meta name="robots" content="noindex">
         @endif
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite([
+            'resources/css/app.css',
+            'resources/js/app.js',
+        ])
+        @if ($attributes->has('broadcasting') && $attributes->get('broadcasting'))
+            @vite(['resources/js/broadcasting.js']);
+        @endif
     </head>
     <body>
         <div id="app" class="min-h-screen flex flex-col">
             <x-header :feature="$attributes->get('feature')"></x-header>
-            <main class="flex-1 px-3 md:px-10 py-3 md:py-7 w-5xl max-w-screen mx-auto mb-40">
+            <main class="flex-1 px-1 md:px-10 py-3 md:py-7 w-5xl max-w-screen mx-auto mb-40">
                 {{ $slot }}
             </main>
             <x-footer></x-footer>
