@@ -9,6 +9,7 @@ import VInput from './components/VInput.vue';
 import VLabel from './components/VLabel.vue';
 import VLegend from './components/VLegend.vue';
 import { useEcho } from '@laravel/echo-vue';
+import LZString from 'lz-string';
 
 const props = defineProps({
     rota: Object,
@@ -44,12 +45,23 @@ const copyLink = () => {
     setTimeout(() => shared.value = false, 3000);
 }
 
+const moveItemInArray = (arr, fromIdx, toIdx) => {
+  let numberOfDeletedElm = 1;
+  const elm = arr.splice(fromIdx, numberOfDeletedElm)[0];
+  numberOfDeletedElm = 0;
+  arr.splice(toIdx, numberOfDeletedElm, elm);
+}
+
 const getUniqueRoleId = () => {
     return getNextIdFromExistingIds(rota.value.roles.map(role => role.id));
 }
 
 const getUniqueTimeslotId = () => {
     return getNextIdFromExistingIds(rota.value.timeslots.map(role => role.id));
+}
+
+const getUniquePersonId = () => {
+    return getNextIdFromExistingIds(rota.value.people.map(p => p.id));
 }
 
 const getNextIdFromExistingIds = (existingIds) => {
@@ -62,6 +74,7 @@ const submitHeaders = () => {
 }
 
 const onHeaderUpdate = () => {
+    prunePeopleList();
     if(lastHeadersUpdate.value > moment().subtract(1, 'seconds') && !headersWaitingForUpdate.value) {
         headersWaitingForUpdate.value = true;
         setTimeout(() => {
@@ -86,8 +99,10 @@ const encryptAndUpdateRota = (successCallback) => {
         people: rota.value.people,
     };
 
+    let compressed = 'compressed:' + LZString.compressToEncodedURIComponent(JSON.stringify(dataForm));
+
     let encryptedForm = {
-        data: crypt.value.encrypt(JSON.stringify(dataForm)),
+        data: crypt.value.encrypt(compressed),
     };
     encryptedForm.signature = crypt.value.getSignatureFromFormObject(['data'], encryptedForm);
 
@@ -110,8 +125,10 @@ const encryptAndUpdateRota = (successCallback) => {
 
 const addRole = (name) => {
     name = name ?? '';
-    rota.value.roles.push({name: name, id: getUniqueRoleId()});
+    let role = {name: name, id: getUniqueRoleId()};
+    rota.value.roles.push(role);
     onHeaderUpdate();
+    return role;
 }
 
 const removeRole = (role) => {
@@ -119,14 +136,48 @@ const removeRole = (role) => {
     onHeaderUpdate();
 }
 
+const moveRoleRight = (role) => {
+    let idx = rota.value.roles.findIndex((v) => role.id == v.id);
+    if(idx < rota.value.roles.length - 1) {
+        moveItemInArray(rota.value.roles, idx, idx + 1);
+    }
+    onHeaderUpdate();
+}
+
+const moveRoleLeft = (role) => {
+    let idx = rota.value.roles.findIndex((v) => role.id == v.id);
+    if(idx > 0) {
+        moveItemInArray(rota.value.roles, idx, idx - 1);
+    }
+    onHeaderUpdate();
+}
+
 const addTimeslot = (name) => {
     name = name ?? '';
-    rota.value.timeslots.push({name: name, id: getUniqueTimeslotId()});
+    let timeslot = {name: name, id: getUniqueTimeslotId()}
+    rota.value.timeslots.push(timeslot);
     onHeaderUpdate();
+    return timeslot;
 }
 
 const removeTimeslot = (timeslot) => {
     rota.value.timeslots = rota.value.timeslots.filter((value) => value.id != timeslot.id);
+    onHeaderUpdate();
+}
+
+const moveTimeslotDown = (timeslot) => {
+    let idx = rota.value.timeslots.findIndex((v) => timeslot.id == v.id);
+    if(idx < rota.value.timeslots.length - 1) {
+        moveItemInArray(rota.value.timeslots, idx, idx + 1);
+    }
+    onHeaderUpdate();
+}
+
+const moveTimeslotUp = (timeslot) => {
+    let idx = rota.value.timeslots.findIndex((v) => timeslot.id == v.id);
+    if(idx > 0) {
+        moveItemInArray(rota.value.timeslots, idx, idx - 1);
+    }
     onHeaderUpdate();
 }
 
@@ -144,6 +195,7 @@ const closeAddPersonModal = () => {
 const addPerson = (name, role, timeslot) => {
     rota.value.people.push({
         name: name,
+        id: getUniquePersonId(),
         rid: role.id,
         tid: timeslot.id,
     });
@@ -154,15 +206,32 @@ const addPerson = (name, role, timeslot) => {
 
 const removePerson = (person) => {
     rota.value.people = rota.value.people.filter((value) => value.id != person.id);
+    encryptAndUpdateRota();
+}
+
+const prunePeopleList = () => {
+    let roleIds = rota.value.roles.map(r => r.id);
+    let timeslotIds = rota.value.timeslots.map(r => r.id);
+    rota.value.people = rota.value.people.filter(p => roleIds.includes(p.rid) && timeslotIds.includes(p.tid));
 }
 
 const peopleForRoleAndTimeslot = (role, timeslot) => {
-    return rota.value.people.filter(person => person.rid == role.id && person.tid == timeslot.id);
+    return rota.value.people
+        .filter(person => person.rid == role.id && person.tid == timeslot.id)
+        .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+const uniquePeopleList = () => {
+    return [...new Set(rota.value.people.map(p => p.name))].sort((a, b) => a.localeCompare(b));
 }
 
 const decryptAndSetRotaData = async (rotaData) => {
     await crypt.value.awaitReady();
-    rotaData = JSON.parse(crypt.value.decrypt(rotaData));
+    let data = crypt.value.decrypt(rotaData)
+    if(data.startsWith('compressed:')) {
+        data = LZString.decompressFromEncodedURIComponent(data.replace('compressed:', ''));
+    }
+    rotaData = JSON.parse(data);
     Object.keys(rotaData).forEach(key => {
         rota.value[key] = rotaData[key];
     });
@@ -171,7 +240,6 @@ const decryptAndSetRotaData = async (rotaData) => {
 const setUpEchoListeners = () => {
     Echo.channel(`rota.${rota.value.identifier}.updated`)
         .listen('.rota.updated', (event) => {
-            console.log('event received:', event);
             decryptAndSetRotaData(event.data);
         });
 }
@@ -214,10 +282,10 @@ onMounted(async() => {
             :aria-hidden="posting"
         >
             <div class="flex items-center gap-2 py-3">
-                <h1 class="text-xl font-bold tracking-wider text-left">{{ rota.name }}</h1>
+                <h1 class="text-xl font-bold tracking-wider text-left break-all">{{ rota.name }}</h1>
                 <VButton size="xs" @click="copyLink" class="" dusk="share-btn">
-                    <span v-if="!shared">Share <i class="fas fa-share"></i></span>
-                    <span v-else>Copied <i class="fas fa-check"></i></span>
+                    <span class="flex items-center gap-1" v-if="!shared">Share <i class="fas fa-share"></i></span>
+                    <span class="flex items-center gap-1" v-else>Copied <i class="fas fa-check"></i></span>
                 </VButton>
             </div>
         </div>
@@ -250,9 +318,15 @@ onMounted(async() => {
                                         <span v-if="headersLocked" class="break-all"><b>{{ role.name }}</b></span>
                                         <div v-else class="flex items-center gap-1 px-1">
                                             <label :for="'roleEditInput' + role.id" class="sr-only">Edit role</label>
+                                            <button type="button" class="cursor-pointer" @click="moveRoleLeft(role)" v-if="rota.roles.length > 1">
+                                                <i class="fas fa-angle-left fa-xs text-gray-400" aria-label="Move role left" title="Move role left"></i>
+                                            </button>
                                             <input class="text-center w-full" type="text" v-model="role.name" :id="'roleEditInput' + role.id"
-                                                placeholder="Role..." @input="onHeaderUpdate">
-                                            <button type="button" class="cursor-pointer" @click="removeRole(role)" v-if="rota.roles.length > 1">
+                                                placeholder="Role..." @input="onHeaderUpdate" maxlength="64">
+                                            <button type="button" class="cursor-pointer" @click="moveRoleRight(role)" v-if="rota.roles.length > 1">
+                                                <i class="fas fa-angle-right fa-xs text-gray-400" aria-label="Move role right" title="Move role right"></i>
+                                            </button>
+                                            <button type="button" class="cursor-pointer mx-2" @click="removeRole(role)" v-if="rota.roles.length > 1">
                                                 <i class="fas fa-trash fa-xs text-gray-400" aria-label="Remove role" title="Remove role"></i>
                                             </button>
                                         </div>
@@ -277,23 +351,38 @@ onMounted(async() => {
                                                 v-model="timeslot.name"
                                                 :id="'timeslotEditInput' + timeslot.id"
                                                 @input="onHeaderUpdate"
+                                                maxlDown="64"
                                             >
-                                            <button type="button" class="cursor-pointer" @click="removeTimeslot(timeslot)"
-                                                v-if="rota.timeslots.length > 1">
-                                                <i class="fas fa-trash fa-xs text-gray-400" aria-label="Remove slot" title="Remove slot"></i>
-                                            </button>
+                                            <div class="flex flex-col justify-center gap-1">
+                                                <button type="button" class="cursor-pointer" @click="moveTimeslotUp(timeslot)" v-if="rota.timeslots.length > 1">
+                                                    <i class="fas fa-angle-up fa-xs text-gray-400" aria-label="Move timeslot up" title="Move timeslot up"></i>
+                                                </button>
+                                                <button type="button" class="cursor-pointer" @click="removeTimeslot(timeslot)"
+                                                    v-if="rota.timeslots.length > 1">
+                                                    <i class="fas fa-trash fa-xs text-gray-400" aria-label="Remove slot" title="Remove slot"></i>
+                                                </button>
+                                                <button type="button" class="cursor-pointer" @click="moveTimeslotDown(timeslot)" v-if="rota.timeslots.length > 1">
+                                                    <i class="fas fa-angle-down fa-xs text-gray-400" aria-label="Move timeslot down" title="Move timeslot down"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </th>
                                 <td
                                     v-for="role in rota.roles"
-                                    class="border border-gray-400 p-2 relative text-center min-w-40 group"
+                                    class="border border-gray-400 px-2 py-1 relative text-center min-w-40 group"
                                     :class="[!headersLocked ? 'pointer-events-none opacity-50' : '']"
                                     :disabled="!headersLocked"
                                 >
                                     <ul>
-                                        <li v-for="person in peopleForRoleAndTimeslot(role, timeslot)">
+                                        <li
+                                            v-for="person in peopleForRoleAndTimeslot(role, timeslot)"
+                                            class="bg-gray-300 rounded-full px-1 py-px my-1 font-semibold"
+                                        >
                                             {{ person.name }}
+                                            <button @click="removePerson(person)" class="text-gray-500 text-xs cursor-pointer">
+                                                <i class="fa fa-trash" :aria-label="'Remove ' + person.name"></i>
+                                            </button>
                                         </li>
                                     </ul>
                                     <VButton
@@ -309,12 +398,12 @@ onMounted(async() => {
                         </tbody>
                     </table>
                 </div>
-                <div class="w-0">
+                <div class="">
                     <VButton
                         type="button"
                         color="secondary"
                         size="sm"
-                        v-if="!headersLocked"
+                        v-if="!headersLocked && rota.roles.length < 24"
                         @click="addRole()"
                     >
                         <i class="fas fa-plus" aria-label="Add role" title="Add role"></i>
@@ -326,7 +415,7 @@ onMounted(async() => {
                     type="button"
                     color="secondary"
                     size="sm"
-                    v-if="!headersLocked"
+                    v-if="!headersLocked && rota.timeslots.length < 96"
                     @click="addTimeslot()"
                 >
                     <i class="fas fa-plus" aria-label="Add slot" title="Add slot"></i>
@@ -348,7 +437,17 @@ onMounted(async() => {
                             Add person to {{ addPersonModalData.role.name }} for {{ addPersonModalData.timeslot.name }}
                         </VLegend>
                         <VLabel for="addPersonName">Name</VLabel>
-                        <VInput id="addPersonName" v-model="addPersonForm.name" maxlength="255" required></VInput>
+                        <VInput id="addPersonName" v-model="addPersonForm.name" maxlength="32" required></VInput>
+                        <ul class="flex gap-2 flex-wrap items-center">
+                            <li v-for="person in uniquePeopleList()" class="my-3">
+                                <VButton
+                                    type="button"
+                                    @click="addPersonForm.name = person"
+                                    color="secondary"
+                                    size="sm"
+                                >{{ person }}</VButton>
+                            </li>
+                        </ul>
                     </fieldset>
                     <div class="flex justify-between">
                         <VButton type="button" color="secondary" @click="addPersonModalShow = false">Cancel</VButton>
