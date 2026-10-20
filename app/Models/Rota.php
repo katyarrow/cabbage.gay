@@ -16,7 +16,6 @@ class Rota extends Model
     }
 
     protected static function booted(): void
-
     {
         static::creating(function (Rota $rota) {
             $rota->generateAndSetNewVersion();
@@ -29,7 +28,8 @@ class Rota extends Model
     }
 
     // Does not save().
-    public function generateAndSetNewVersion() {
+    public function generateAndSetNewVersion()
+    {
         $this->version = str()->random(16);
     }
 

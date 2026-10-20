@@ -9,7 +9,6 @@ use Illuminate\Translation\PotentiallyTranslatedString;
 
 class MatchesVersionOnRota implements ValidationRule
 {
-
     public function __construct(public Rota $rota) {}
 
     /**
@@ -19,7 +18,7 @@ class MatchesVersionOnRota implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if($this->rota->version !== $value) {
+        if ($this->rota->version !== $value) {
             $fail('Changes have been made since you last edited the rota, please refresh the page.');
         }
     }

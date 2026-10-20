@@ -3,15 +3,12 @@
 namespace App\Http\Requests;
 
 use App\Http\Services\CryptService;
-use App\Models\Meeting;
 use App\Models\Rota;
 use App\Rules\EncryptedMax;
-use App\Rules\EncryptedSize;
 use App\Rules\Hexadecimal;
 use App\Rules\MatchesVersionOnRota;
 use App\Rules\SignsRequest;
-use App\Rules\VerifiesCaptchaToken;
-use Carbon\Carbon;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RotaUpdateRequest extends FormRequest
@@ -27,7 +24,7 @@ class RotaUpdateRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
