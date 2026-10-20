@@ -11,11 +11,13 @@ class SiteWideMessage extends Model
         'display_until' => 'datetime',
     ];
 
-    public function scopeCurrentlyViewable(Builder $query) {
+    public function scopeCurrentlyViewable(Builder $query)
+    {
         return $query->where('display_until', '>', now());
     }
 
-    public function scopeNotCurrentlyViewable(Builder $query) {
+    public function scopeNotCurrentlyViewable(Builder $query)
+    {
         return $query->where('display_until', '<=', now());
     }
 }

@@ -4,11 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SiteWideMessage;
-use Auth;
 use Carbon\Carbon;
-use Hash;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 
 class AdminSiteMessageController extends Controller
 {
@@ -20,7 +17,7 @@ class AdminSiteMessageController extends Controller
             'message_hours_to_display' => 'required|numeric|min:1',
         ]);
 
-        $message = new SiteWideMessage();
+        $message = new SiteWideMessage;
         $message->message = $request->input('message_value');
         $message->level = $request->input('message_level');
         $message->display_until = Carbon::now()->addHours($request->integer('message_hours_to_display'));
@@ -29,8 +26,10 @@ class AdminSiteMessageController extends Controller
         return redirect()->back();
     }
 
-    public function destroy(SiteWideMessage $message) {
+    public function destroy(SiteWideMessage $message)
+    {
         $message->delete();
+
         return redirect()->back();
     }
 }
