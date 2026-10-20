@@ -12,6 +12,7 @@ class Rota extends Model
     {
         return [
             'destroy_at' => 'date',
+            'updated_at' => 'datetime',
         ];
     }
 
