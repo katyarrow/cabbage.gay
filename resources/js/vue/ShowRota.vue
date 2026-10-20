@@ -8,7 +8,6 @@ import { VueFinalModal } from 'vue-final-modal';
 import VInput from './components/VInput.vue';
 import VLabel from './components/VLabel.vue';
 import VLegend from './components/VLegend.vue';
-import { useEcho } from '@laravel/echo-vue';
 import LZString from 'lz-string';
 
 const props = defineProps({
@@ -30,6 +29,10 @@ const addPersonForm = ref({
 const formErrors = ref({});
 const lastHeadersUpdate = ref(moment());
 const headersWaitingForUpdate = ref(false);
+const deleteModal = ref({
+    shown: false,
+    onDelete: null,
+});
 
 const rota = ref({
     name: null,
@@ -103,8 +106,9 @@ const encryptAndUpdateRota = (successCallback) => {
 
     let encryptedForm = {
         data: crypt.value.encrypt(compressed),
+        version: rota.value.version,
     };
-    encryptedForm.signature = crypt.value.getSignatureFromFormObject(['data'], encryptedForm);
+    encryptedForm.signature = crypt.value.getSignatureFromFormObject(['data', 'version'], encryptedForm);
 
     axios.post(rota.value.update_route, encryptedForm)
         .then(response => {
@@ -118,7 +122,6 @@ const encryptAndUpdateRota = (successCallback) => {
                 Object.entries(error.response.data.errors).forEach(([k, v]) => {
                     formErrors.value[k] = v[0];
                 });
-                console.log(formErrors);
             }
         });
 }
@@ -241,6 +244,7 @@ const setUpEchoListeners = () => {
     Echo.channel(`rota.${rota.value.identifier}.updated`)
         .listen('.rota.updated', (event) => {
             decryptAndSetRotaData(event.data);
+            rota.value.version = event.version;
         });
 }
 
@@ -251,6 +255,7 @@ onMounted(async() => {
     await crypt.value.awaitReady();
     crypt.value.privateKey = crypt.value.decrypt(props.rota.private_key);
     rota.value.destroy_at = props.rota.destroy_at;
+    rota.value.version = props.rota.version;
     rota.value.show_route = props.rota.show_route;
     rota.value.update_route = props.rota.update_route;
     rota.value.name = rota.value.name.substring(0, 255);
@@ -272,7 +277,7 @@ onMounted(async() => {
 
 <template>
     <div aria-live="polite">
-        <VAlert v-model="globalError"></VAlert>
+        <VAlert v-model="globalError" :contextList="Object.values(formErrors)"></VAlert>
         <div v-if="!loaded" class="flex items-center justify-center mt-10">
             <span class="animate-pulse font-semibold text-2xl" v-if="!loaded">Loading...</span>
         </div>
@@ -326,7 +331,7 @@ onMounted(async() => {
                                             <button type="button" class="cursor-pointer" @click="moveRoleRight(role)" v-if="rota.roles.length > 1">
                                                 <i class="fas fa-angle-right fa-xs text-gray-400" aria-label="Move role right" title="Move role right"></i>
                                             </button>
-                                            <button type="button" class="cursor-pointer mx-2" @click="removeRole(role)" v-if="rota.roles.length > 1">
+                                            <button type="button" class="cursor-pointer mx-2" @click="deleteModal.shown = true; deleteModal.onDelete = () => removeRole(role)" v-if="rota.roles.length > 1">
                                                 <i class="fas fa-trash fa-xs text-gray-400" aria-label="Remove role" title="Remove role"></i>
                                             </button>
                                         </div>
@@ -357,7 +362,7 @@ onMounted(async() => {
                                                 <button type="button" class="cursor-pointer" @click="moveTimeslotUp(timeslot)" v-if="rota.timeslots.length > 1">
                                                     <i class="fas fa-angle-up fa-xs text-gray-400" aria-label="Move timeslot up" title="Move timeslot up"></i>
                                                 </button>
-                                                <button type="button" class="cursor-pointer" @click="removeTimeslot(timeslot)"
+                                                <button type="button" class="cursor-pointer" @click="deleteModal.shown = true; deleteModal.onDelete = () => removeTimeslot(timeslot)"
                                                     v-if="rota.timeslots.length > 1">
                                                     <i class="fas fa-trash fa-xs text-gray-400" aria-label="Remove slot" title="Remove slot"></i>
                                                 </button>
@@ -453,6 +458,18 @@ onMounted(async() => {
                         <VButton type="button" color="secondary" @click="addPersonModalShow = false">Cancel</VButton>
                         <VButton type="submit">Add Person</VButton>
                     </div>
+                </div>
+            </form>
+        </VueFinalModal>
+        <VueFinalModal
+            v-model="deleteModal.shown" class="flex justify-center items-center"
+            content-class="bg-white p-5 rounded relative">
+            <button class="absolute top-0 right-1 cursor-pointer" @click="deleteModal.shown = false" aria-label="Close Modal"><i class="fa fa-xmark"></i></button>
+            <form @submit.prevent="deleteModal.onDelete(); deleteModal.shown = false;">
+                <span class="break-all">Are you sure?</span>
+                <div class="flex items-center justify-between mt-5 gap-4">
+                    <VButton dusk="delete-user-btn" type="submit" color="danger">Delete</VButton>
+                    <VButton type="button" color="secondary" @click="deleteModal.shown = false">Cancel</VButton>
                 </div>
             </form>
         </VueFinalModal>

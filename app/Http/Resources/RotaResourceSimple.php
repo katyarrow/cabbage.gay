@@ -16,6 +16,7 @@ class RotaResourceSimple extends JsonResource
     {
         return [
             'data' => $this->data,
+            'version' => $this->version,
         ];
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Rota;
 use App\Rules\EncryptedMax;
 use App\Rules\EncryptedSize;
 use App\Rules\Hexadecimal;
+use App\Rules\MatchesVersionOnRota;
 use App\Rules\SignsRequest;
 use App\Rules\VerifiesCaptchaToken;
 use Carbon\Carbon;
@@ -32,9 +33,9 @@ class RotaUpdateRequest extends FormRequest
     {
         $rules = [
             'data' => ['required', new Hexadecimal, new EncryptedMax(CryptService::MAX_ROTA_LENGTH)],
+            'version' => ['required', new MatchesVersionOnRota($this->rota)],
         ];
 
-        // We probably don't want to sign the private and public keys.
         return array_merge($rules, [
             'signature' => ['required', new SignsRequest(array_keys($rules), $this->rota->public_key)],
         ]);

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('public_key');
             $table->text('data');
             $table->date('destroy_at');
-            $table->datetime('updated_at');
+            $table->string('version');
         });
     }
 

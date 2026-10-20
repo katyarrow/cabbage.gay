@@ -11,7 +11,7 @@
         <div class="w-xs max-w-full flex flex-col gap-5">
             <v-button href="{{ route('meeting.create') }}">Create a Meeting Poll    </v-button>
 
-            <v-button href="{{ route('rota.create') }}">Create a Rota</v-button>
+            <v-button href="{{ route('rota.create') }}">Create a Rota (beta)</v-button>
         </div>
     </div>
 </x-main-layout>

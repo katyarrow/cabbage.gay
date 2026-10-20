@@ -19,6 +19,7 @@ class RotaResource extends JsonResource
             'private_key' => $this->private_key,
             'data' => $this->data,
             'destroy_at' => $this->destroy_at,
+            'version' => $this->version,
             'show_route' => route('rota.show', $this),
             'update_route' => route('rota.update', $this),
         ];

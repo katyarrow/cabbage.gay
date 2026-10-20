@@ -12,8 +12,25 @@ class Rota extends Model
     {
         return [
             'destroy_at' => 'date',
-            'updated_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+
+    {
+        static::creating(function (Rota $rota) {
+            $rota->generateAndSetNewVersion();
+        });
+
+        static::updating(function (Rota $rota) {
+            $rota->generateAndSetNewVersion();
+        });
+
+    }
+
+    // Does not save().
+    public function generateAndSetNewVersion() {
+        $this->version = str()->random(16);
     }
 
     // SCOPES
