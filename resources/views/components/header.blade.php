@@ -1,8 +1,15 @@
 <header class="relative">
-    <div class="flex justify-between px-2 py-1 gap-2">
-        <div class="relative">
-            
-        </div>
+    <ul>
+        @foreach (\App\Models\SiteWideMessage::currentlyViewable()->orderBy('level')->get() as $message)
+            <li class="
+                {{ ['danger' => 'bg-red-400', 'warning' => 'bg-yellow-400', 'info' => 'bg-blue-400'][$message->level] }}
+                p-2 text-gray-800 font-semibold text-center font-mono shadow-lg border border-b border-black
+            " role="alert">
+                {{ $message->message }}
+            </li>
+        @endforeach
+    </ul>
+    <div class="flex justify-end px-2 py-1 gap-2">
         <div class="flex gap-2">
             <a
                 href="{{ route('faq') }}"

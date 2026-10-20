@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminKillSwitchController;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminLogoutController;
 use App\Http\Controllers\Admin\AdminPanelController;
+use App\Http\Controllers\Admin\AdminSiteMessageController;
 use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\DonateController;
 use App\Http\Controllers\FAQController;
@@ -45,5 +46,7 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin', [AdminPanelController::class, 'index'])->name('admin.index');
     Route::post('/admin/killswitch', [AdminKillSwitchController::class, 'store'])->name('admin.killswitch');
+    Route::post('/admin/site-message', [AdminSiteMessageController::class, 'store'])->name('admin.site-messsage.store');
+    Route::delete('/admin/site-message/{message}', [AdminSiteMessageController::class, 'destroy'])->name('admin.site-messsage.delete');
     Route::delete('/logout', [AdminLogoutController::class, 'destroy'])->name('logout');
 });
