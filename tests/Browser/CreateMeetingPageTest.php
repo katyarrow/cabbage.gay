@@ -5,17 +5,17 @@ namespace Tests\Browser;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
-class HomePageTest extends DuskTestCase
+class CreateMeetingPageTest extends DuskTestCase
 {
-    public function test_homepage(): void
+    public function test_create_meeting_page(): void
     {
         $this->browse(function (Browser $browser) {
-            $browser->visit('/');
+            $browser->visit('/meeting');
 
             $browser->assertHasHeaderAndFooter();
 
             // General check for base inputs.
-            $browser->assertTitle('Home - cabbage.gay');
+            $browser->assertTitle('Meeting - cabbage.gay');
             $browser->assertSee('Create a Meeting');
             $browser->assertInputPresent('name');
             $browser->assertInputPresent('start_date');
@@ -55,10 +55,10 @@ class HomePageTest extends DuskTestCase
         });
     }
 
-    public function test_homepage_submit(): void
+    public function test_create_meeting_page_submit(): void
     {
         $this->browse(function (Browser $browser) {
-            $browser->visit('/');
+            $browser->visit('/meeting');
 
             $browser->type('name', 'test123');
             $browser->typeDateField('#start_date', now()->addDays(1));

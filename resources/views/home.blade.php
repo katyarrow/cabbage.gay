@@ -9,7 +9,7 @@
             What would you like to do?
         </h1>
         <div class="w-xs max-w-full flex flex-col gap-5">
-            <v-button href="{{ route('meeting.create') }}">Create a Meeting Poll    </v-button>
+            <v-button href="{{ route('meeting.create') }}">Create a Meeting Poll</v-button>
 
             <v-button href="{{ route('rota.create') }}">Create a Rota (beta)</v-button>
         </div>
