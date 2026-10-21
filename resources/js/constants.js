@@ -5,4 +5,6 @@ export default {
     AVAILABILITY_YES: 'yes',
     AVAILABILITY_MAYBE: 'maybe',
     AVAILABILITY_NO: 'no',
+
+    URL_DONATION_PAGE: '/donate',
 }

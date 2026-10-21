@@ -4,3 +4,29 @@
 
 @config "../../tailwind.config.js";
 @source "..views";
+
+@keyframes tilt-shaking {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(2deg); }
+  50% { transform: rotate(0eg); }
+  75% { transform: rotate(-2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.animate-shake {
+    animation: tilt-shaking 0.3s infinite both;
+}
+
+.animate-shake-once {
+    animation: tilt-shaking 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-shake {
+        animation: none;
+    }
+
+    .animate-shake-once {
+        animation: none;
+    }
+}

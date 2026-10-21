@@ -7,7 +7,7 @@
         <li class="my-10">
             <h2 class="text-xl font-semibold tracking-wider text-left">1. What is {{ config('app.name') }}?</h2>
             <p>
-                {{ config('app.name') }} is an end to end encrypted meeting poll application / scheduler.
+                {{ config('app.name') }} is an end to end encrypted meeting poll / rota application.
                 It provides more security (see question 2) than an application that is not end to end encrypted as
                 the server never sees your data (see question 3).
             </p>
@@ -20,7 +20,7 @@
                 What it <em>does not</em> do is stop malicious programs and individuals on your computer from viewing the
                 data that has been decrypted. This means that theoretically your browser or other programs on your computer
                 can see the decrypted data you are viewing.<br/>
-                Furthermore, if someone has access to the unique meeting url then they will be able to view the data regardless.
+                Furthermore, if someone has access to the unique meeting or rota url then they will be able to view the data regardless.
             </p>
         </li>
         <li class="my-10">
@@ -30,10 +30,10 @@
                 functioning of the site. This data includes the following:
                 <ul class="list-disc list-inside">
                     <li class="my-2">Session cookies.</li>
-                    <li class="my-2">Destroy dates of meetings.</li>
-                    <li class="my-2">Meeting identifiers used in the URL.</li>
+                    <li class="my-2">Destroy dates of meetings and rotas.</li>
+                    <li class="my-2">Meeting and rota identifiers used in the URL.</li>
                     <li class="my-2">Unique attendee identifiers (an impossible to guess random string used to identify encrypted response data to update or delete it).</li>
-                    <li class="my-2">The public part of an asymetric cryptographic keypair unique to each meeting.</li>
+                    <li class="my-2">The public part of an asymetric cryptographic keypair unique to each meeting or rota.</li>
                 </ul>
                 Beyond this, an attacker who has managed to access the server could trivially perform an analysis of
                 a meeting and determine how many responses it has had. Now this data would be pretty useless without being able
@@ -56,7 +56,11 @@
             <h2 class="text-xl font-semibold tracking-wider text-left">5. Is this a paid service?</h2>
             <p>
                 No, this site will not be paywalled or make money off you in any other way
-                (though a donation link may be set up in future to cover maintenance and upkeep).
+                @if (config('donate.active'))
+                    (though we do have ways to <a href="{{ route('donate') }}" class="underline text-green-600">donate to the project</a> if you are enjoying it).
+                @else
+                    (though a donation link may be set up in future to cover maintenance and upkeep).
+                @endif
             </p>
         </li>
         <li class="my-10">

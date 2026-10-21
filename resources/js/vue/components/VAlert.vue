@@ -7,6 +7,10 @@ const props = defineProps({
     level: {
         type: String,
         default: 'danger',
+    },
+    contextList: {
+        type: Array,
+        default: null,
     }
 });
 
@@ -21,8 +25,13 @@ if(props.level == 'danger') {
 </script>
 
 <template>
-    <p class="rounded shadow px-2 py-1 flex align-center text-gray-50 font-semibold" :class="colors" v-if="model" role="alert">
-        <span class="flex-1">{{ model }}</span>
+    <div class="rounded shadow px-2 py-1 flex align-center text-gray-50 font-semibold" :class="colors" v-if="model" role="alert">
+        <div class="flex-1">
+            {{ model }}
+            <ul v-if="contextList">
+                <li class="list-disc" v-for="message in contextList">{{ message }}</li>
+            </ul>
+        </div>
         <button @click="model = null" class="cursor-pointer">x</button>
-    </p>
+    </div>
 </template>

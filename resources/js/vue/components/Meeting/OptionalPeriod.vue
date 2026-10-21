@@ -18,7 +18,10 @@ const props = defineProps({
     userTimezone: String,
 });
 
-const emit = defineEmits(['submit']);
+const emit = defineEmits([
+    'submit',
+    'do-add-availability-shake',
+]);
 const selectedAttendee = defineModel('selectedAttendee', {type: Object, default: null});
 const selectedDay = defineModel('selectedDay', {type: Object, default: null});
 
@@ -35,6 +38,8 @@ const availability = ref({
     name: null,
     dates: {},
 });
+const currentDiscoModeColorIndex = ref(0);
+const discoModeColors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
 
 const paginatedDays = computed(() => {
     let startIndex = perPage.value * page.value;
@@ -70,6 +75,10 @@ const updatePageSize = () => {
         perPage.value = 7;
     } else {
         perPage.value = 4;
+    }
+
+    if(page.value >= paginatedDays.value.totalPages) {
+        page.value = paginatedDays.value.totalPages - 1;
     }
 }
 
@@ -269,11 +278,46 @@ const pointerMove = (event) => {
     });
 }
 
+const swipePrevPage = () => {
+    if(props.mode == constants.MEETING_MODE_SHOW) {
+        prevPage();
+    }
+}
+
+const swipeNextPage = () => {
+    if(props.mode == constants.MEETING_MODE_SHOW) {
+        nextPage();
+    }
+}
+
+const prevPage = () => {
+    if(!paginatedDays.value.isFirstPage) {
+        page.value--;
+    }
+}
+
+const nextPage = () => {
+    if(!paginatedDays.value.isLastPage) {
+        page.value++;
+    }
+}
+
+const setDiscoModeInterval = () => {
+    setInterval(() => {
+        currentDiscoModeColorIndex.value = (currentDiscoModeColorIndex.value + 1) % discoModeColors.length;
+    }, 300);
+}
+
+const doAddAvailabilityShake = () => {
+    emit('do-add-availability-shake');
+}
+
 onMounted(() => {
     document.addEventListener('mouseup', stopDrag);
     document.addEventListener('touchend', stopDrag);
     addEventListener("resize", updatePageSize);
     updatePageSize();
+    setDiscoModeInterval();
 });
 
 generateDays();
@@ -300,11 +344,17 @@ const submit = () => {
     <component :is="props.mode == constants.MEETING_MODE_SHOW ? 'div' : 'form'" @submit.prevent="submit">
         <p class="text-center text-gray-800">{{ currentPaginatedMonths }}</p>
         <div class="relative flex items-center">
-            <button dusk="prev-page-btn" type="button" class="absolute -left-6 cursor-pointer" v-if="!paginatedDays.isFirstPage" @click="page--">
+            <button dusk="prev-page-btn" type="button" class="absolute -left-6 cursor-pointer" v-if="!paginatedDays.isFirstPage" @click="prevPage">
                 <span class="sr-only">Previous page</span>
                 <i class="fa fa-chevron-left text-3xl text-gray-300"></i>
             </button>
-            <table class="w-full my-5 table-fixed touch-none" ondragstart="return false;" ondragend="return false;" :key="JSON.stringify(props.selectedAttendee)">
+            <table
+                class="w-full my-5 table-fixed touch-none"
+                ondragstart="return false;"
+                ondragend="return false;"
+                :key="JSON.stringify(props.selectedAttendee)"
+                v-touch:swipe.left="swipeNextPage"
+                v-touch:swipe.right="swipePrevPage">
                 <thead>
                     <tr>
                         <th scope="col" class="w-11"><span class="sr-only">Times</span></th>
@@ -374,11 +424,11 @@ const submit = () => {
                                     @pointermove="pointerMove"
                                     :dusk="'availability_btn_' + addDateAndTime(day.date, time.time).format('YYYY-MM-DD-HH-mm')">
                                     <span class="sr-only" v-if="getAvailability(day.date, time.time) == constants.AVAILABILITY_YES">Change to maybe</span>
-                                    <span class="sr-only" v-else="getAvailability(day.date, time.time) == constants.AVAILABILITY_MAYBE">Change to no</span>
+                                    <span class="sr-only" v-else-if="getAvailability(day.date, time.time) == constants.AVAILABILITY_MAYBE">Change to no</span>
                                     <span class="sr-only" v-else>Change to yes</span>
                                 </button>
                             </div>
-                            <div v-else class="h-full">
+                            <div v-else class="h-full" @pointerdown="!gridSquareDisplayInfo(day.date, time.time).total ? doAddAvailabilityShake() : null">
                                 <div v-if="displayType == 'proportion' || props.selectedAttendee" class="h-full w-full relative select-none" :style="{opacity: gridSquareDisplayInfo(day.date, time.time).opacity}">
                                     <div
                                         class="bg-yellow-300 inline-flex items-center justify-center absolute top-0 bottom-0 left-0"
@@ -445,6 +495,15 @@ const submit = () => {
                                         </span>
                                     </div>
                                 </div>
+                                <div v-else-if="displayType == 'disco'"
+                                    class="h-full w-full relative select-none flex items-center justify-center transition-colors duration-150"
+                                    :style="{
+                                        opacity: gridSquareDisplayInfo(day.date, time.time).opacity,
+                                        'background-color': discoModeColors[currentDiscoModeColorIndex],
+                                    }">
+                                    <i class="far fa-circle-check text-xs" v-if="props.symbolMode && gridSquareDisplayInfo(day.date, time.time).opacity > 0"></i>
+                                    <span class="sr-only">{{ gridSquareDisplayInfo(day.date, time.time).total }} responses</span>
+                                </div>
                                 <button
                                     type="button"
                                     class="box-border absolute inset-0 hover:border border-dashed"
@@ -458,7 +517,7 @@ const submit = () => {
                     </tr>
                 </tbody>
             </table>
-            <button dusk="next-page-btn" type="button" class="absolute -right-6 cursor-pointer" v-if="!paginatedDays.isLastPage" @click="page++">
+            <button dusk="next-page-btn" type="button" class="absolute -right-6 cursor-pointer" v-if="!paginatedDays.isLastPage" @click="nextPage">
                 <span class="sr-only">Next page</span>
                 <i class="fa fa-chevron-right text-3xl text-gray-300"></i>
             </button>
@@ -473,15 +532,16 @@ const submit = () => {
                     <option value="gradient">Gradient</option>
                     <option value="numbers">Numbers</option>
                     <option value="gradient_numbers">Gradient + Numbers</option>
+                    <option value="disco">DISCO (warning: flashing lights)</option>
                 </VSelect>
             </div>
         </div>
         <div class="flex gap-5 justify-center items-center" v-if="mode == constants.MEETING_MODE_ADD && paginatedDays.totalPages > 1">
-            <VButton dusk="adding-prev-page-btn" type="button" size="sm" :disabled="paginatedDays.isFirstPage" @click="page--" class="flex-1 md:flex-auto">
+            <VButton dusk="adding-prev-page-btn" type="button" size="sm" :disabled="paginatedDays.isFirstPage" @click="prevPage" class="flex-1 md:flex-auto">
                 <i class="fa fa-chevron-left"></i> Previous <span class="sr-only">Page</span>
             </VButton>
             <p class="text-gray-500">Page {{ paginatedDays.currentPage + 1 }} / {{ paginatedDays.lastPage }}</p>
-            <VButton dusk="adding-next-page-btn" type="button" size="sm" :disabled="paginatedDays.isLastPage" @click="page++" class="flex-1 md:flex-auto">
+            <VButton dusk="adding-next-page-btn" type="button" size="sm" :disabled="paginatedDays.isLastPage" @click="nextPage" class="flex-1 md:flex-auto">
                 Next <span class="sr-only">Page</span> <i class="fa fa-chevron-right"></i>
             </VButton>
         </div>

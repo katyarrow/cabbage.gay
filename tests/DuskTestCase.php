@@ -53,7 +53,11 @@ abstract class DuskTestCase extends BaseTestCase
         });
 
         Browser::macro('createMeeting', function (array $data = []): Browser {
+<<<<<<< HEAD
             $this->visit('/');
+=======
+            $this->visit('/meeting');
+>>>>>>> main
             $this->type('name', $data['name'] ?? str()->random());
             if (array_key_exists('entire_period', $data) && $data['entire_period']) {
                 $this->check('entire_period');
@@ -81,6 +85,23 @@ abstract class DuskTestCase extends BaseTestCase
 
             $this->waitForReload();
 
+<<<<<<< HEAD
+=======
+            return $this;
+        });
+
+        Browser::macro('createRota', function (array $data = []): Browser {
+            $this->visit('/rota');
+            $this->type('name', $data['name'] ?? str()->random());
+            if (array_key_exists('destroy_at', $data)) {
+                $this->typeDateField('#destroy_at', $data['destroy_at']);
+            }
+
+            $this->press('button[type="submit"]');
+
+            $this->waitForReload();
+
+>>>>>>> main
             return $this;
         });
 

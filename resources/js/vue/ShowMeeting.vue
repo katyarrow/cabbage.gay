@@ -25,6 +25,7 @@ const mode = ref(constants.MEETING_MODE_SHOW);
 const shared = ref(false);
 const selectedAttendee = ref(null);
 const selectedDay = ref(null);
+const addAvailabilityButtonClass = ref('');
 
 const meeting = ref({
     name: null,
@@ -147,16 +148,29 @@ const setMode = modeToSet => {
     mode.value = modeToSet;
 }
 
+const doAddAvailabilityShake = () => {
+    addAvailabilityButtonClass.value = 'animate-shake-once';
+    setTimeout(() => {
+        addAvailabilityButtonClass.value = '';
+    }, 500);
+}
+
 </script>
 
 <template>
     <div aria-live="polite">
         <VAlert v-model="globalError"></VAlert>
-        <div v-if="!loaded || posting" class="flex items-center justify-center mt-10">
+        <div v-if="!loaded" class="flex items-center justify-center mt-10">
             <span class="animate-pulse font-semibold text-2xl" v-if="!loaded">Loading...</span>
-            <span class="animate-pulse font-semibold text-2xl" v-if="posting">Sending data...</span>
         </div>
-        <div v-else :class="meeting.entire_period ? '' : 'px-5'">
+        <div
+            v-else
+            :class="[
+                meeting.entire_period ? '' : 'px-5',
+                posting ? 'hidden' : ''
+            ]"
+            :aria-hidden="posting"
+        >
             <div class="grid grid-cols-2 py-3">
                 <div class="flex flex-col">
                     <div class="flex items-center">
@@ -176,7 +190,9 @@ const setMode = modeToSet => {
                     </div>
                 </div>
                 <div class="flex flex-col justify-start items-end gap-2">
-                    <VButton size="sm" v-if="mode == constants.MEETING_MODE_SHOW" @click="setModeAdd" dusk="add-availability-btn">Add&nbsp;Availability</VButton>
+                    <VButton size="sm" v-if="mode == constants.MEETING_MODE_SHOW" @click="setModeAdd" dusk="add-availability-btn" :class="addAvailabilityButtonClass">
+                        Add&nbsp;Availability
+                    </VButton>
                     <VButton size="sm" v-if="mode == constants.MEETING_MODE_ADD" color="danger" @click="setModeShow" dusk="cancel-adding-availability-btn">Cancel</VButton>
                     <VLabel class="select-none hidden md:block" v-if="!meeting.entire_period">
                         Symbol Mode
@@ -216,6 +232,7 @@ const setMode = modeToSet => {
                         v-model:selected-day="selectedDay"
                         :mode="mode"
                         @submit="onAttendeeSubmit"
+                        @do-add-availability-shake="doAddAvailabilityShake"
                     ></EntirePeriod>
                     <OptionalPeriod
                         v-else
@@ -228,6 +245,7 @@ const setMode = modeToSet => {
                         v-model:selected-attendee="selectedAttendee"
                         v-model:selected-day="selectedDay"
                         @submit="onAttendeeSubmit"
+                        @do-add-availability-shake="doAddAvailabilityShake"
                     ></OptionalPeriod>
                 </div>
                 <div :class="[meeting.entire_period ? '' : 'my-5 md:mt-10']" v-if="mode == constants.MEETING_MODE_SHOW">
@@ -277,6 +295,9 @@ const setMode = modeToSet => {
                     </ul>
                 </div>
             </div>
+        </div>
+        <div v-if="posting" class="flex items-center justify-center mt-10">
+            <span class="animate-pulse font-semibold text-2xl">Sending data...</span>
         </div>
         <p class="text-center text-gray-700 font-medium mt-20">
             This poll will self destruct on the {{ moment(meeting.destroy_at).format('Do of MMMM YYYY') }}

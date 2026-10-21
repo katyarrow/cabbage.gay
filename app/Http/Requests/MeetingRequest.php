@@ -10,6 +10,7 @@ use App\Rules\Hexadecimal;
 use App\Rules\SignsRequest;
 use App\Rules\VerifiesCaptchaToken;
 use Carbon\Carbon;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MeetingRequest extends FormRequest
@@ -25,7 +26,7 @@ class MeetingRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

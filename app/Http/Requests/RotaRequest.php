@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Http\Requests;
+
+use App\Http\Services\CryptService;
+use App\Models\Rota;
+use App\Rules\EncryptedMax;
+use App\Rules\EncryptedSize;
+use App\Rules\Hexadecimal;
+use App\Rules\SignsRequest;
+use App\Rules\VerifiesCaptchaToken;
+use Carbon\Carbon;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+
+class RotaRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        $rules = [
+            'data' => ['required', new Hexadecimal, new EncryptedMax(CryptService::MAX_ROTA_LENGTH)],
+            'destroy_at' => ['required', 'date', 'after_or_equal:tomorrow'],
+        ];
+
+        // We probably don't want to sign the private and public keys.
+        return array_merge($rules, [
+            'private_key' => ['required', new Hexadecimal, new EncryptedSize(CryptService::ENCRYPTED_PRIVATE_KEY_LENGTH)],
+            'public_key' => ['required', new Hexadecimal, new EncryptedSize(CryptService::UNENCRYPTED_PUBLIC_KEY_LENGTH)],
+            'signature' => ['required', new SignsRequest(array_keys($rules), $this->public_key)],
+            'captcha' => [new VerifiesCaptchaToken],
+        ]);
+    }
+
+    public function save(Rota $rota)
+    {
+        do {
+            $identifier = str()->random(16);
+        } while (Rota::identifier($identifier)->exists());
+        $rota->identifier = $identifier;
+        $rota->private_key = $this->private_key;
+        $rota->public_key = $this->public_key;
+        $rota->data = $this->data;
+        $givenDestroyDate = Carbon::parse($this->destroy_at);
+        $rota->destroy_at = $givenDestroyDate < now()->addMonths(6) ? $givenDestroyDate : now()->addMonths(6);
+        $rota->save();
+    }
+}
