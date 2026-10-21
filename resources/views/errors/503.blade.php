@@ -2,4 +2,4 @@
 
 @section('title', __('Service Unavailable'))
 @section('code', '503')
-@section('message', __('Down for maintenance'))
+@section('message', __('Down for maintenance, be back soon!'))

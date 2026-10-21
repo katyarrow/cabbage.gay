@@ -13,7 +13,7 @@ class ErrorPageTest extends DuskTestCase
             $browser->visit('/'.str()->random())
                 ->assertTitle('Not Found')
                 ->assertSee('404')
-                ->assertSee('Not Found', true);
+                ->assertSee('Unfortunately we could not find what you were looking for.', true);
         });
     }
 }
