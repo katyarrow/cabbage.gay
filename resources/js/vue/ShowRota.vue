@@ -312,7 +312,9 @@ onMounted(async() => {
                                     <span class="sr-only">Timeslots</span>
                                     <button class="cursor-pointer" @click="headersLocked ? headersLocked = false : null" :type="headersLocked ? 'button' : 'submit'" dusk="edit-headers-btn">
                                         <i class="fas fa-edit fa-xs text-green-700" aria-label="Edit headers" title="Edit headers" v-if="headersLocked"></i>
-                                        <i class="fas fa-save text-white bg-green-700 rounded shadow p-1 m-1" aria-label="Save headers" title="Save headers" v-else></i>
+                                        <div v-else class="text-white bg-green-700 rounded shadow p-px m-1">
+                                            <i class="fas fa-save" aria-label="Save headers" title="Save headers"></i>
+                                        </div>
                                     </button>
                                 </th>
                                 <th

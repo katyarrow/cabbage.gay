@@ -424,7 +424,7 @@ const submit = () => {
                                     @pointermove="pointerMove"
                                     :dusk="'availability_btn_' + addDateAndTime(day.date, time.time).format('YYYY-MM-DD-HH-mm')">
                                     <span class="sr-only" v-if="getAvailability(day.date, time.time) == constants.AVAILABILITY_YES">Change to maybe</span>
-                                    <span class="sr-only" v-else="getAvailability(day.date, time.time) == constants.AVAILABILITY_MAYBE">Change to no</span>
+                                    <span class="sr-only" v-else-if="getAvailability(day.date, time.time) == constants.AVAILABILITY_MAYBE">Change to no</span>
                                     <span class="sr-only" v-else>Change to yes</span>
                                 </button>
                             </div>
