@@ -112,6 +112,7 @@ const encryptAndUpdateRota = (successCallback) => {
 
     axios.post(rota.value.update_route, encryptedForm)
         .then(response => {
+            rota.value.version = response.data.version;
             if(successCallback) {
                 successCallback();
             }

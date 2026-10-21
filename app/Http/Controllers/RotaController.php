@@ -35,7 +35,7 @@ class RotaController extends Controller
     public function update(RotaUpdateRequest $request, Rota $rota): RotaResourceSimple
     {
         $request->save($rota);
-        broadcast(new RotaUpdated($rota));
+        broadcast(new RotaUpdated($rota))->toOthers();
 
         return new RotaResourceSimple($rota);
     }
