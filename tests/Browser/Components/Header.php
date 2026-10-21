@@ -21,10 +21,7 @@ class Header extends BaseComponent
     public function assert(Browser $browser): void
     {
         $browser->assertVisible($this->selector());
-<<<<<<< HEAD
-=======
         $browser->assertSeeIn($this->selector().' a[href="'.route('donate').'"]', 'DONATE');
->>>>>>> main
         $browser->assertSeeIn($this->selector().' a[href="'.route('faq').'"]', 'FAQ');
         $browser->assertSeeIn($this->selector().' a[href="'.route('home').'"]', 'cabbage.gay');
     }

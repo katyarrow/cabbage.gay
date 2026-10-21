@@ -53,11 +53,7 @@ abstract class DuskTestCase extends BaseTestCase
         });
 
         Browser::macro('createMeeting', function (array $data = []): Browser {
-<<<<<<< HEAD
-            $this->visit('/');
-=======
             $this->visit('/meeting');
->>>>>>> main
             $this->type('name', $data['name'] ?? str()->random());
             if (array_key_exists('entire_period', $data) && $data['entire_period']) {
                 $this->check('entire_period');
@@ -85,8 +81,6 @@ abstract class DuskTestCase extends BaseTestCase
 
             $this->waitForReload();
 
-<<<<<<< HEAD
-=======
             return $this;
         });
 
@@ -101,7 +95,6 @@ abstract class DuskTestCase extends BaseTestCase
 
             $this->waitForReload();
 
->>>>>>> main
             return $this;
         });
 
