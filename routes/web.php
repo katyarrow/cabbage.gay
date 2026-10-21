@@ -9,6 +9,7 @@ use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\DonateController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InstructionsController;
 use App\Http\Controllers\MeetingAttendeeController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\RefreshCsrfTokenController;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/faq', [FAQController::class, 'index'])->name('faq');
+Route::get('/instructions', [InstructionsController::class, 'index'])->name('instructions');
 Route::get('/releases', [ReleasesController::class, 'index'])->name('releases');
 if (config('donate.active')) {
     Route::get('/donate', [DonateController::class, 'index'])->name('donate');

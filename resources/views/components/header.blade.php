@@ -12,6 +12,12 @@
     <div class="flex justify-end px-2 py-1 gap-2">
         <div class="flex gap-2">
             <a
+                href="{{ route('instructions') }}"
+                class="rounded bg-green-600 text-white px-2 font-bold tracking-wider"
+                title="Instructions">
+                <i class="fas fa-info" aria-label="Instructions"></i>
+            </a>
+            <a
                 href="{{ route('faq') }}"
                 class="rounded bg-green-600 text-white px-2 font-bold tracking-wider">
                 FAQ
