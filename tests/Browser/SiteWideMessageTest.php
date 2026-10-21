@@ -23,13 +23,15 @@ class SiteWideMessageTest extends DuskTestCase
             $message2->display_until = now()->subHour(1);
             $message2->save();
 
-            $browser->visit('/');
+            try {
+                $browser->visit('/');
 
-            $browser->assertSee('Message should show.');
-            $browser->assertDontSee('Message should not show.');
-
-            $message1->delete();
-            $message2->delete();
+                $browser->assertSee('Message should show.');
+                $browser->assertDontSee('Message should not show.');
+            } finally {
+                $message1->delete();
+                $message2->delete();
+            }
         });
     }
 }
