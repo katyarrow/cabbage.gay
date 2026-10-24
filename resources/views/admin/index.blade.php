@@ -6,6 +6,10 @@
             <h3 class="text-lg font-semibold">Total Meetings</h3>
             <b>{{ \App\Models\Meeting::count() }}</b>
         </div>
+        <div class="border rounded-lg shadow p-5 flex items-center justify-between">
+            <h3 class="text-lg font-semibold">Total Current Rotas</h3>
+            <b>{{ \App\Models\Rota::count() }}</b>
+        </div>
 
         <hr class="col-span-full my-5">
 
