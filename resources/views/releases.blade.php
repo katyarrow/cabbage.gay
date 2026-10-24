@@ -4,6 +4,16 @@
 >
     <h1 class="text-3xl font-semibold tracking-wider text-center mb-5">Releases</h1>
 
+    <h2 class="text-xl font-semibold tracking-wider text-left mt-10">v2.0.0</h2>
+    <p>24/10/2026 Major update for 2026.</p>
+    <ul class="list-disc ml-5">
+        <li class="my-3">Updated backend and frontend for security.</li>
+        <li class="my-3">Added rota system (still in beta).</li>
+        <li class="my-3">Added site wide messages.</li>
+        <li class="my-3">Added instruction page.</li>
+        <li class="my-3">Updated error pages.</li>
+    </ul>
+
     <h2 class="text-xl font-semibold tracking-wider text-left mt-10">v1.2.0</h2>
     <p>28/03/2026 security update, donation prompt.</p>
     <ul class="list-disc ml-5">
