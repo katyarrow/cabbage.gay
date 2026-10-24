@@ -5,6 +5,10 @@
                 {{ ['danger' => 'bg-red-400', 'warning' => 'bg-yellow-400', 'info' => 'bg-blue-400'][$message->level] }}
                 p-2 text-gray-800 font-semibold text-center font-mono shadow-lg border border-b border-black
             " role="alert">
+                <i
+                    class="fas {{ ['danger' => 'fa-triangle-exclamation', 'warning' => 'fa-triangle-exclamation', 'info' => 'fa-circle-info'][$message->level] }}"
+                    aria-label="{{ ['danger' => 'Danger Icon', 'warning' => 'Warning Icon', 'info' => 'Info Icon'][$message->level] }}"
+                ></i>
                 {{ $message->message }}
             </li>
         @endforeach
