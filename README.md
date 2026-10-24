@@ -11,6 +11,8 @@
 - Supervisor (set to run reverb, see next point)
 - Reverb production set up (see [laravel docs](https://laravel.com/framework/docs/12.x/reverb#production))
 
+Ideally a dockerized version of this setup will be created in future but for now a manual set up is required.
+
 ## Releases
 
 ### v2.0.0
