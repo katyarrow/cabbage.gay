@@ -301,7 +301,7 @@ onMounted(async() => {
         <component :is="headersLocked ? 'div' : 'form'" @submit.prevent="submitHeaders">
             <div class="flex items-center max-w-full gap-2 justify-center">
                 <div class="overflow-x-auto max-w-full">
-                    <table class="mx-px my-5 table-fixed touch-none text-sm md:text-normal">
+                    <table class="mx-px my-5 table-fixed text-sm md:text-normal">
                         <thead>
                             <tr>
                                 <th
