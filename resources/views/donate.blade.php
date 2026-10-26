@@ -21,6 +21,18 @@
                 </a>
             </p>
         @endif
+        @if (config('donate.buy_me_a_coffee'))
+            <h2 class="text-xl font-semibold tracking-wider mt-10">Buy me a coffee</h2>
+            <p>
+                <a
+                    class="underline text-green-600"
+                    href="{{ config('donate.buy_me_a_coffee') }}"
+                    target="_blank"
+                >
+                    Donate through buy me a coffee here
+                </a>
+            </p>
+        @endif
         @if (config('donate.email_address'))
             <h2 class="text-xl font-semibold tracking-wider mt-10">Other Ways</h2>
             <p>
