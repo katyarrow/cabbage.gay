@@ -4,6 +4,15 @@
 >
     <h1 class="text-3xl font-semibold tracking-wider text-center mb-5">Releases</h1>
 
+    <h2 class="text-xl font-semibold tracking-wider text-left mt-10">v2.0.1</h2>
+    <p>26/10/2026 Minor bug fixes and changes for previous release.</p>
+    <ul class="list-disc ml-5">
+        <li class="my-3">Fixed an issue with padding.</li>
+        <li class="my-3">Removed locally built assets from git.</li>
+        <li class="my-3">Added delete routine for expired rotas.</li>
+        <li class="my-3">Allowed touch events on rotas.</li>
+    </ul>
+
     <h2 class="text-xl font-semibold tracking-wider text-left mt-10">v2.0.0</h2>
     <p>24/10/2026 Major update for 2026.</p>
     <ul class="list-disc ml-5">

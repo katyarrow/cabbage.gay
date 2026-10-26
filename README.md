@@ -4,6 +4,7 @@
 ### Requirements
 - MariaDB or MySQL
 - Nginx or Apache (ideally running PHP FPM)
+- Node to build assets.
 - Supervisor (set to run reverb)
 - The usual set of laravel extensions for php (see [laravel docs](https://laravel.com/framework/docs/deployment#server-requirements))
 - sodium php extension
@@ -14,6 +15,13 @@
 Ideally a dockerized version of this setup will be created in future but for now a manual set up is required.
 
 ## Releases
+
+### v2.0.1
+26/10/2026 Minor bug fixes and changes for previous release.
+- Fixed an issue with padding.
+- Removed locally built assets from git.
+- Added delete routine for expired rotas.
+- Allowed touch events on rotas.
 
 ### v2.0.0
 24/10/2026 Major update for 2026.
