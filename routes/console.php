@@ -1,9 +1,11 @@
 <?php
 
 use App\Console\Commands\DeleteExpiredMeetings;
+use App\Console\Commands\DeleteExpiredRotas;
 use App\Console\Commands\RemoveExpiredCaptchas;
 
 Schedule::command(DeleteExpiredMeetings::class)->hourly();
+Schedule::command(DeleteExpiredRotas::class)->hourly();
 Schedule::command(RemoveExpiredCaptchas::class)->everyMinute();
 
 // Backups
