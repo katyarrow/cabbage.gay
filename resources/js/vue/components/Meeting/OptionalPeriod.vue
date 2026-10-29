@@ -182,6 +182,10 @@ const selectedDayIsSame = (day, time) => {
 
 const gridSquareDisplayInfoCache = ref({});
 
+const clearGridSquareDisplayInfoCache = () => {
+    gridSquareDisplayInfoCache.value = {};
+}
+
 const gradient = [
     '#00c750',
     '#68d03a',
@@ -327,11 +331,14 @@ watch(() => props.mode, () => {
         generateFreshAvailability();
     }
     selectedDay.value = null;
-    gridSquareDisplayInfoCache.value = {};
-})
+    clearGridSquareDisplayInfoCache();
+});
 watch(() => props.selectedAttendee, () => {
-    gridSquareDisplayInfoCache.value = {};
-})
+    clearGridSquareDisplayInfoCache();
+});
+watch(() => props.attendees, () => {
+    clearGridSquareDisplayInfoCache();
+});
 
 const submit = () => {
     emit('submit', JSON.stringify(availability.value));
